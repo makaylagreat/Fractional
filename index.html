@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>People Systems Readiness Assessment</title>
+  <style>
+    /* =============================================
+       RESET & BASE
+    ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand:       #4F46E5;
+      --brand-dark:  #3730A3;
+      --brand-light: #EEF2FF;
+      --accent:      #06B6D4;
+      --success:     #10B981;
+      --warning:     #F59E0B;
+      --danger:      #EF4444;
+      --text:        #1E1B4B;
+      --text-muted:  #6B7280;
+      --border:      #E5E7EB;
+      --bg:          #F9FAFB;
+      --card:        #FFFFFF;
+      --radius:      14px;
+      --shadow:      0 4px 24px rgba(79,70,229,.10);
+      --transition:  .22s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* =============================================
+       PROGRESS BAR (sticky)
+    ============================================= */
+    #progress-bar-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      width: 100%;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: none; /* shown during assessment steps */
+    }
+
+    #progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: .78rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    #progress-track {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    #progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand), var(--accent));
+      border-radius: 99px;
+      transition: width .4s ease;
+    }
+
+    /* =============================================
+       LAYOUT WRAPPER
+    ============================================= */
+    #app {
+      width: 100%;
+      max-width: 680px;
+      padding: 24px 16px 60px;
+      flex: 1;
+    }
+
+    /* =============================================
+       CARD
+    ============================================= */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 36px 32px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 28px 20px; }
+    }
+
+    /* =============================================
+       SCREENS (fade transition)
+    ============================================= */
+    .screen {
+      animation: fadeIn .3s ease both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* =============================================
+       TYPOGRAPHY
+    ============================================= */
+    h1 { font-size: 2rem; font-weight: 800; line-height: 1.2; }
+    h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; }
+    h3 { font-size: 1.1rem; font-weight: 700; }
+    p  { line-height: 1.7; color: var(--text-muted); }
+
+    .subhead {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    .label-tag {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      padding: 3px 10px;
+      border-radius: 99px;
+      background: var(--brand-light);
+      color: var(--brand);
+      margin-bottom: 14px;
+    }
+
+    /* =============================================
+       BUTTONS
+    ============================================= */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 13px 26px;
+      border-radius: 10px;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: transform var(--transition), box-shadow var(--transition), background var(--transition), opacity var(--transition);
+      text-decoration: none;
+    }
+
+    .btn:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(79,70,229,.35);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--brand-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(79,70,229,.40);
+    }
+
+    .btn-primary:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--brand);
+      border: 2px solid var(--brand);
+    }
+
+    .btn-secondary:hover {
+      background: var(--brand-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: var(--bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(16,185,129,.3);
+    }
+
+    .btn-success:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: .85rem;
+      border-radius: 8px;
+    }
+
+    .btn-full { width: 100%; }
+
+    /* =============================================
+       NAV ROW
+    ============================================= */
+    .nav-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+      align-items: center;
+    }
+
+    .nav-row .btn-primary { flex: 1; }
+
+    /* =============================================
+       LIKERT QUESTION
+    ============================================= */
+    .question-block {
+      margin-bottom: 28px;
+    }
+
+    .question-block:last-child { margin-bottom: 0; }
+
+    .question-text {
+      font-size: .97rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .likert-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .likert-option {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .likert-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .likert-option label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 10px 6px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color var(--transition), background var(--transition), transform var(--transition);
+      min-width: 44px;
+    }
+
+    .likert-option label:hover {
+      border-color: var(--brand);
+      background: var(--brand-light);
+      transform: translateY(-2px);
+    }
+
+    .likert-option input[type="radio"]:focus-visible + label {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .likert-option input[type="radio"]:checked + label {
+      border-color: var(--brand);
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .likert-num {
+      font-size: 1.1rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .likert-label {
+      font-size: .65rem;
+      font-weight: 500;
+      line-height: 1.2;
+      color: inherit;
+      opacity: .85;
+    }
+
+    .likert-option input[type="radio"]:checked + label .likert-label {
+      opacity: 1;
+      color: rgba(255,255,255,.9);
+    }
+
+    /* Scale legend */
+    .scale-legend {
+      display: flex;
+      justify-content: space-between;
+      font-size: .72rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      padding: 0 2px;
+    }
+
+    /* =============================================
+       LANDING SCREEN
+    ============================================= */
+    #screen-landing .hero-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      padding: 4px 14px;
+      border-radius: 99px;
+      margin-bottom: 18px;
+    }
+
+    #screen-landing h1 {
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    #screen-landing h1 span {
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      margin: 28px 0;
+      flex-wrap: wrap;
+    }
+
+    .stat-chip {
+      flex: 1;
+      min-width: 120px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+
+    .stat-chip strong {
+      display: block;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--brand);
+    }
+
+    .stat-chip span {
+      font-size: .78rem;
+      color: var(--text-muted);
+    }
+
+    /* =============================================
+       ABOUT SCREEN
+    ============================================= */
+    .bullet-list {
+      list-style: none;
+      margin: 20px 0;
+    }
+
+    .bullet-list li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .bullet-list li:last-child { border-bottom: none; }
+
+    .bullet-icon {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      border-radius: 8px;
+      background: var(--brand-light);
+      color: var(--brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .9rem;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+
+    .privacy-note {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: .82rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-top: 20px;
+    }
+
+    /* =============================================
+       RESULTS SCREEN
+    ============================================= */
+    .tier-banner {
+      border-radius: var(--radius);
+      padding: 24px 24px 20px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tier-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: .08;
+      background: radial-gradient(circle at 80% 20%, #fff 0%, transparent 60%);
+    }
+
+    .tier-not-yet   { background: linear-gradient(135deg, #6366F1, #818CF8); color: #fff; }
+    .tier-soon      { background: linear-gradient(135deg, #F59E0B, #FBBF24); color: #fff; }
+    .tier-yes       { background: linear-gradient(135deg, #F97316, #FB923C); color: #fff; }
+    .tier-urgent    { background: linear-gradient(135deg, #EF4444, #F87171); color: #fff; }
+
+    .tier-banner h2 { color: #fff; font-size: 1.3rem; margin-bottom: 6px; }
+    .tier-banner p  { color: rgba(255,255,255,.9); font-size: .95rem; }
+
+    .score-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.25);
+      border: 1px solid rgba(255,255,255,.4);
+      border-radius: 99px;
+      padding: 5px 16px 5px 5px;
+      margin-bottom: 12px;
+    }
+
+    .score-pill-num {
+      background: rgba(255,255,255,.9);
+      color: var(--text);
+      font-weight: 800;
+      font-size: .9rem;
+      border-radius: 99px;
+      padding: 2px 10px;
+    }
+
+    .score-pill-label {
+      color: rgba(255,255,255,.95);
+      font-size: .82rem;
+      font-weight: 600;
+    }
+
+    /* Section headers */
+    .section-header {
+      font-size: .78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--brand);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Risk signals */
+    .risk-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .risk-item:last-child { border-bottom: none; }
+
+    .risk-name {
+      font-size: .93rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .risk-bar-wrap {
+      flex: 1;
+      margin: 0 14px;
+      height: 6px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .risk-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width .7s ease .2s;
+    }
+
+    .risk-score-label {
+      font-size: .83rem;
+      font-weight: 700;
+      min-width: 34px;
+      text-align: right;
+    }
+
+    /* Score color helpers */
+    .score-low    { background: #34D399; color: #065F46; }
+    .score-mid    { background: #FBBF24; color: #92400E; }
+    .score-high   { background: #F97316; color: #7C2D12; }
+    .score-urgent { background: #EF4444; color: #7F1D1D; }
+
+    /* Actions */
+    .action-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .action-item:last-child { border-bottom: none; }
+
+    .action-num {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      border-radius: 50%;
+      background: var(--brand-light);
+      color: var(--brand);
+      font-weight: 800;
+      font-size: .85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .action-text {
+      font-size: .93rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    /* CTA strip */
+    .cta-strip {
+      background: linear-gradient(135deg, var(--brand-light), #E0F2FE);
+      border: 1px solid #C7D2FE;
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    .cta-strip h3 { margin-bottom: 6px; }
+    .cta-strip p  { font-size: .88rem; margin-bottom: 18px; }
+
+    .cta-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .restart-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      font-size: .85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .restart-link:hover { color: var(--brand); }
+
+    /* All category scores mini table */
+    .all-scores-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .score-chip {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+
+    .score-chip-name {
+      font-size: .75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .score-chip-val {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    /* =============================================
+       MODAL
+    ============================================= */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15,10,40,.55);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: fadeIn .2s ease;
+    }
+
+    #modal-overlay.open { display: flex; }
+
+    .modal-box {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      animation: fadeIn .25s ease;
+    }
+
+    @media (max-width: 480px) {
+      .modal-box { padding: 28px 20px; }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--text-muted);
+      transition: background var(--transition);
+    }
+
+    .modal-close:hover { background: var(--border); }
+
+    /* Form */
+    .form-group { margin-bottom: 16px; }
+
+    .form-label {
+      display: block;
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 2px solid var(--border);
+      border-radius: 9px;
+      font-size: .95rem;
+      font-family: inherit;
+      color: var(--text);
+      transition: border-color var(--transition);
+      background: var(--bg);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--brand);
+      background: #fff;
+    }
+
+    .form-input.error { border-color: var(--danger); }
+
+    .form-error {
+      font-size: .8rem;
+      color: var(--danger);
+      margin-top: 4px;
+      display: none;
+    }
+
+    .checkbox-wrap {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .checkbox-wrap input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      accent-color: var(--brand);
+      margin-top: 2px;
+      cursor: pointer;
+    }
+
+    .checkbox-wrap label {
+      font-size: .88rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1.5;
+    }
+
+    /* Success state */
+    #modal-success { display: none; }
+
+    .success-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #D1FAE5;
+      color: var(--success);
+      font-size: 1.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    /* Result summary text box */
+    #result-summary-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 14px;
+      font-size: .82rem;
+      font-family: 'Courier New', monospace;
+      color: var(--text-muted);
+      white-space: pre-wrap;
+      max-height: 220px;
+      overflow-y: auto;
+      margin: 16px 0;
+      line-height: 1.6;
+    }
+
+    .mvp-disclaimer {
+      font-size: .75rem;
+      color: var(--text-muted);
+      background: #FEF3C7;
+      border: 1px solid #FDE68A;
+      border-radius: 7px;
+      padding: 8px 12px;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .copy-feedback {
+      font-size: .8rem;
+      color: var(--success);
+      text-align: center;
+      margin-top: 6px;
+      min-height: 18px;
+      font-weight: 600;
+    }
+
+    /* =============================================
+       DIVIDER
+    ============================================= */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    /* =============================================
+       RESPONSIVE TWEAKS
+    ============================================= */
+    @media (max-width: 520px) {
+      h1 { font-size: 1.6rem; }
+      h2 { font-size: 1.25rem; }
+      .all-scores-grid { grid-template-columns: 1fr; }
+      .likert-num { font-size: .95rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- =============================================
+     STICKY PROGRESS BAR
+============================================= -->
+<div id="progress-bar-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+  <div id="progress-meta">
+    <span id="progress-step-label">Step 1 of 7</span>
+    <span id="progress-pct-label">0%</span>
+  </div>
+  <div id="progress-track">
+    <div id="progress-fill" style="width:0%"></div>
+  </div>
+</div>
+
+<!-- =============================================
+     APP ROOT
+============================================= -->
+<div id="app" role="main">
+
+  <!-- ── SCREEN 0: LANDING ── -->
+  <div id="screen-landing" class="screen">
+    <div class="card">
+      <div class="hero-tag">Free Assessment · 5 min</div>
+      <h1>Is your company ready for a <span>Fractional CPO?</span></h1>
+      <p class="subhead">
+        Answer 20 questions about how your people systems are running today.
+        Get an instant score, your top risk signals, and a personalised action plan.
+      </p>
+
+      <div class="stats-row">
+        <div class="stat-chip">
+          <strong>20</strong>
+          <span>Questions</span>
+        </div>
+        <div class="stat-chip">
+          <strong>5 min</strong>
+          <span>Average time</span>
+        </div>
+        <div class="stat-chip">
+          <strong>4</strong>
+          <span>Result tiers</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="btn-start" aria-label="Start assessment">
+        Start the Assessment →
+      </button>
+
+      <p style="text-align:center; font-size:.8rem; margin-top:14px;">
+        No account needed · Results shown instantly
+      </p>
+    </div>
+  </div>
+
+  <!-- ── SCREEN 1: ABOUT ── -->
+  <div id="screen-about" class="screen" style="display:none">
+    <div class="card">
+      <div class="label-tag">How it works</div>
+      <h2>A quick, honest diagnostic</h2>
+      <p>You'll rate 20 statements about how your organisation is running today.</p>
+
+      <ul class="bullet-list" aria-label="How the assessment works">
+        <li>
+          <span class="bullet-icon" aria-hidden="true">1</span>
+          <span><strong>5 categories, 4 questions each</strong> — covering clarity, hiring, managers, retention, and risk foundations.</span>
+        </li>
+        <li>
+          <span class="bullet-icon" aria-hidden="true">2</span>
+          <span><strong>Instant weighted score</strong> — we calculate where your biggest friction is and map you to one of four readiness tiers.</span>
+        </li>
+        <li>
+          <span class="bullet-icon" aria-hidden="true">3</span>
+          <span><strong>Actionable output</strong> — you'll leave with your top 3 risk signals and 3 concrete next steps tailored to your tier.</span>
+        </li>
+      </ul>
+
+      <div class="privacy-note" role="note">
+        <span aria-hidden="true">🔒</span>
+        <span>We'll email your results only if you choose. Your answers are stored locally in your browser and never sent anywhere automatically.</span>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn btn-ghost" id="btn-about-back">← Back</button>
+        <button class="btn btn-primary" id="btn-about-next">Let's go →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCREENS 2–6: ASSESSMENT (injected by JS) ── -->
+  <div id="screen-assessment" class="screen" style="display:none">
+    <!-- Dynamically populated -->
+  </div>
+
+  <!-- ── SCREEN 7: RESULTS ── -->
+  <div id="screen-results" class="screen" style="display:none">
+    <!-- Dynamically populated -->
+  </div>
+
+</div>
+
+<!-- =============================================
+     LEAD CAPTURE MODAL
+============================================= -->
+<div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close-btn" aria-label="Close modal">✕</button>
+
+    <!-- Form state -->
+    <div id="modal-form">
+      <div class="label-tag">Action plan</div>
+      <h3 id="modal-title" style="margin-bottom:8px;">Get your 1-page action plan</h3>
+      
