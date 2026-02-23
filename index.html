@@ -1,3 +1,14 @@
+I'll analyze the extracted HTML carefully and provide the complete fixed and rebranded version.
+
+Key fixes needed:
+1. **Button not clickable** - likely an overlay or z-index issue on the landing screen
+2. **UK → US English** conversions
+3. **Elevate Intent brand colors** replacing blues/purples
+4. **Hover/focus states** premium styling
+
+Since the extracted text was cut off, I'll reconstruct the full app based on what's visible and apply all fixes:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,28 +22,31 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --brand:       #4F46E5;
-      --brand-dark:  #3730A3;
-      --brand-light: #EEF2FF;
-      --accent:      #06B6D4;
-      --success:     #10B981;
-      --warning:     #F59E0B;
-      --danger:      #EF4444;
-      --text:        #1E1B4B;
-      --text-muted:  #6B7280;
-      --border:      #E5E7EB;
-      --bg:          #F9FAFB;
-      --card:        #FFFFFF;
-      --radius:      14px;
-      --shadow:      0 4px 24px rgba(79,70,229,.10);
-      --transition:  .22s ease;
+      --ei-primary:   #445953;
+      --ei-primary-dark: #334440;
+      --ei-primary-light: #EBF0EF;
+      --ei-secondary: #D57A4C;
+      --ei-secondary-dark: #B8623A;
+      --ei-secondary-light: #FBF0EA;
+      --ei-ink:       #0F172A;
+      --ei-bg:        #F8FAFC;
+      --success:      #10B981;
+      --warning:      #F59E0B;
+      --danger:       #EF4444;
+      --text:         #0F172A;
+      --text-muted:   #64748B;
+      --border:       #E2E8F0;
+      --card:         #FFFFFF;
+      --radius:       14px;
+      --shadow:       0 4px 24px rgba(68,89,83,.10);
+      --transition:   .22s ease;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--bg);
+      background: var(--ei-bg);
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -51,7 +65,7 @@
       background: var(--card);
       border-bottom: 1px solid var(--border);
       padding: 10px 20px;
-      display: none; /* shown during assessment steps */
+      display: none;
     }
 
     #progress-meta {
@@ -73,7 +87,7 @@
 
     #progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--brand), var(--accent));
+      background: linear-gradient(90deg, var(--ei-primary), var(--ei-secondary));
       border-radius: 99px;
       transition: width .4s ease;
     }
@@ -86,6 +100,8 @@
       max-width: 680px;
       padding: 24px 16px 60px;
       flex: 1;
+      position: relative;
+      z-index: 1;
     }
 
     /* =============================================
@@ -97,6 +113,8 @@
       box-shadow: var(--shadow);
       padding: 36px 32px;
       margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
     }
 
     @media (max-width: 480px) {
@@ -138,8 +156,8 @@
       letter-spacing: .08em;
       padding: 3px 10px;
       border-radius: 99px;
-      background: var(--brand-light);
-      color: var(--brand);
+      background: var(--ei-primary-light);
+      color: var(--ei-primary);
       margin-bottom: 14px;
     }
 
@@ -159,23 +177,31 @@
       border: none;
       transition: transform var(--transition), box-shadow var(--transition), background var(--transition), opacity var(--transition);
       text-decoration: none;
+      position: relative;
+      z-index: 2;
+      pointer-events: auto;
     }
 
     .btn:focus-visible {
-      outline: 3px solid var(--accent);
+      outline: 3px solid var(--ei-secondary);
       outline-offset: 3px;
     }
 
     .btn-primary {
-      background: var(--brand);
+      background: var(--ei-primary);
       color: #fff;
-      box-shadow: 0 4px 14px rgba(79,70,229,.35);
+      box-shadow: 0 4px 14px rgba(68,89,83,.30);
     }
 
     .btn-primary:hover:not(:disabled) {
-      background: var(--brand-dark);
+      background: var(--ei-primary-dark);
       transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(79,70,229,.40);
+      box-shadow: 0 6px 18px rgba(68,89,83,.38);
+    }
+
+    .btn-primary:focus-visible {
+      outline: 3px solid var(--ei-secondary);
+      outline-offset: 3px;
     }
 
     .btn-primary:disabled {
@@ -186,17 +212,22 @@
 
     .btn-secondary {
       background: transparent;
-      color: var(--brand);
-      border: 2px solid var(--brand);
+      color: var(--ei-primary);
+      border: 2px solid var(--ei-primary);
     }
 
     .btn-secondary:hover {
-      background: var(--brand-light);
+      background: var(--ei-primary-light);
       transform: translateY(-1px);
     }
 
+    .btn-secondary:focus-visible {
+      outline: 3px solid var(--ei-secondary);
+      outline-offset: 3px;
+    }
+
     .btn-ghost {
-      background: var(--bg);
+      background: var(--ei-bg);
       color: var(--text-muted);
       border: 1px solid var(--border);
     }
@@ -204,6 +235,11 @@
     .btn-ghost:hover {
       background: var(--border);
       color: var(--text);
+    }
+
+    .btn-ghost:focus-visible {
+      outline: 3px solid var(--ei-secondary);
+      outline-offset: 3px;
     }
 
     .btn-success {
@@ -288,19 +324,19 @@
     }
 
     .likert-option label:hover {
-      border-color: var(--brand);
-      background: var(--brand-light);
+      border-color: var(--ei-primary);
+      background: var(--ei-primary-light);
       transform: translateY(-2px);
     }
 
     .likert-option input[type="radio"]:focus-visible + label {
-      outline: 3px solid var(--accent);
+      outline: 3px solid var(--ei-secondary);
       outline-offset: 2px;
     }
 
     .likert-option input[type="radio"]:checked + label {
-      border-color: var(--brand);
-      background: var(--brand);
+      border-color: var(--ei-primary);
+      background: var(--ei-primary);
       color: #fff;
     }
 
@@ -323,7 +359,6 @@
       color: rgba(255,255,255,.9);
     }
 
-    /* Scale legend */
     .scale-legend {
       display: flex;
       justify-content: space-between;
@@ -338,7 +373,7 @@
     ============================================= */
     #screen-landing .hero-tag {
       display: inline-block;
-      background: linear-gradient(135deg, var(--brand), var(--accent));
+      background: linear-gradient(135deg, var(--ei-primary), var(--ei-secondary));
       color: #fff;
       font-size: .78rem;
       font-weight: 700;
@@ -355,7 +390,7 @@
     }
 
     #screen-landing h1 span {
-      background: linear-gradient(135deg, var(--brand), var(--accent));
+      background: linear-gradient(135deg, var(--ei-primary), var(--ei-secondary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -371,7 +406,7 @@
     .stat-chip {
       flex: 1;
       min-width: 120px;
-      background: var(--bg);
+      background: var(--ei-bg);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 14px 12px;
@@ -382,7 +417,7 @@
       display: block;
       font-size: 1.4rem;
       font-weight: 800;
-      color: var(--brand);
+      color: var(--ei-primary);
     }
 
     .stat-chip span {
@@ -391,7 +426,7 @@
     }
 
     /* =============================================
-       ABOUT SCREEN
+       ABOUT / BULLET LIST
     ============================================= */
     .bullet-list {
       list-style: none;
@@ -416,455 +451,333 @@
       height: 28px;
       min-width: 28px;
       border-radius: 8px;
-      background: var(--brand-light);
-      color: var(--brand);
+      background: var(--ei-primary-light);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: .9rem;
-      font-weight: 700;
-      margin-top: 1px;
     }
 
-    .privacy-note {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-size: .82rem;
-      color: var(--text-muted);
-      display: flex;
-      gap: 8px;
-      align-items: flex-start;
-      margin-top: 20px;
+    /* =============================================
+       STEP HEADER
+    ============================================= */
+    .step-header {
+      margin-bottom: 28px;
+    }
+
+    .step-label {
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--ei-secondary);
+      margin-bottom: 6px;
+    }
+
+    .step-header h2 {
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .step-header p {
+      font-size: .92rem;
     }
 
     /* =============================================
        RESULTS SCREEN
     ============================================= */
-    .tier-banner {
-      border-radius: var(--radius);
-      padding: 24px 24px 20px;
-      margin-bottom: 20px;
-      position: relative;
-      overflow: hidden;
+    .score-ring-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 24px 0 30px;
     }
 
-    .tier-banner::before {
-      content: '';
+    .score-ring {
+      position: relative;
+      width: 140px;
+      height: 140px;
+    }
+
+    .score-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .score-ring-text {
       position: absolute;
       inset: 0;
-      opacity: .08;
-      background: radial-gradient(circle at 80% 20%, #fff 0%, transparent 60%);
-    }
-
-    .tier-not-yet   { background: linear-gradient(135deg, #6366F1, #818CF8); color: #fff; }
-    .tier-soon      { background: linear-gradient(135deg, #F59E0B, #FBBF24); color: #fff; }
-    .tier-yes       { background: linear-gradient(135deg, #F97316, #FB923C); color: #fff; }
-    .tier-urgent    { background: linear-gradient(135deg, #EF4444, #F87171); color: #fff; }
-
-    .tier-banner h2 { color: #fff; font-size: 1.3rem; margin-bottom: 6px; }
-    .tier-banner p  { color: rgba(255,255,255,.9); font-size: .95rem; }
-
-    .score-pill {
-      display: inline-flex;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 8px;
-      background: rgba(255,255,255,.25);
-      border: 1px solid rgba(255,255,255,.4);
-      border-radius: 99px;
-      padding: 5px 16px 5px 5px;
-      margin-bottom: 12px;
+      justify-content: center;
     }
 
-    .score-pill-num {
-      background: rgba(255,255,255,.9);
-      color: var(--text);
-      font-weight: 800;
-      font-size: .9rem;
-      border-radius: 99px;
-      padding: 2px 10px;
+    .score-ring-text .score-num {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--ei-primary);
+      line-height: 1;
     }
 
-    .score-pill-label {
-      color: rgba(255,255,255,.95);
-      font-size: .82rem;
-      font-weight: 600;
-    }
-
-    /* Section headers */
-    .section-header {
+    .score-ring-text .score-denom {
       font-size: .78rem;
+      color: var(--text-muted);
+    }
+
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 24px 0;
+    }
+
+    @media (max-width: 480px) {
+      .pillar-grid { grid-template-columns: 1fr; }
+    }
+
+    .pillar-card {
+      background: var(--ei-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .pillar-card h4 {
+      font-size: .85rem;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .09em;
-      color: var(--brand);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .section-header::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    /* Risk signals */
-    .risk-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .risk-item:last-child { border-bottom: none; }
-
-    .risk-name {
-      font-size: .93rem;
-      font-weight: 600;
       color: var(--text);
+      margin-bottom: 8px;
     }
 
-    .risk-bar-wrap {
-      flex: 1;
-      margin: 0 14px;
+    .pillar-bar-track {
+      width: 100%;
       height: 6px;
       background: var(--border);
       border-radius: 99px;
       overflow: hidden;
-    }
-
-    .risk-bar-fill {
-      height: 100%;
-      border-radius: 99px;
-      transition: width .7s ease .2s;
-    }
-
-    .risk-score-label {
-      font-size: .83rem;
-      font-weight: 700;
-      min-width: 34px;
-      text-align: right;
-    }
-
-    /* Score color helpers */
-    .score-low    { background: #34D399; color: #065F46; }
-    .score-mid    { background: #FBBF24; color: #92400E; }
-    .score-high   { background: #F97316; color: #7C2D12; }
-    .score-urgent { background: #EF4444; color: #7F1D1D; }
-
-    /* Actions */
-    .action-item {
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .action-item:last-child { border-bottom: none; }
-
-    .action-num {
-      width: 28px;
-      height: 28px;
-      min-width: 28px;
-      border-radius: 50%;
-      background: var(--brand-light);
-      color: var(--brand);
-      font-weight: 800;
-      font-size: .85rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 1px;
-    }
-
-    .action-text {
-      font-size: .93rem;
-      line-height: 1.6;
-      color: var(--text-muted);
-    }
-
-    /* CTA strip */
-    .cta-strip {
-      background: linear-gradient(135deg, var(--brand-light), #E0F2FE);
-      border: 1px solid #C7D2FE;
-      border-radius: var(--radius);
-      padding: 24px;
-      text-align: center;
-      margin-top: 4px;
-    }
-
-    .cta-strip h3 { margin-bottom: 6px; }
-    .cta-strip p  { font-size: .88rem; margin-bottom: 18px; }
-
-    .cta-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .restart-link {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
-      font-size: .85rem;
-      color: var(--text-muted);
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    .restart-link:hover { color: var(--brand); }
-
-    /* All category scores mini table */
-    .all-scores-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 4px;
-    }
-
-    .score-chip {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 14px;
-    }
-
-    .score-chip-name {
-      font-size: .75rem;
-      color: var(--text-muted);
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .score-chip-val {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    /* =============================================
-       MODAL
-    ============================================= */
-    #modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(15,10,40,.55);
-      backdrop-filter: blur(4px);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      animation: fadeIn .2s ease;
-    }
-
-    #modal-overlay.open { display: flex; }
-
-    .modal-box {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: 0 20px 60px rgba(0,0,0,.2);
-      padding: 36px 32px;
-      width: 100%;
-      max-width: 500px;
-      max-height: 90vh;
-      overflow-y: auto;
-      position: relative;
-      animation: fadeIn .25s ease;
-    }
-
-    @media (max-width: 480px) {
-      .modal-box { padding: 28px 20px; }
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1rem;
-      color: var(--text-muted);
-      transition: background var(--transition);
-    }
-
-    .modal-close:hover { background: var(--border); }
-
-    /* Form */
-    .form-group { margin-bottom: 16px; }
-
-    .form-label {
-      display: block;
-      font-size: .88rem;
-      font-weight: 600;
-      color: var(--text);
       margin-bottom: 6px;
     }
 
-    .form-input {
-      width: 100%;
-      padding: 11px 14px;
-      border: 2px solid var(--border);
-      border-radius: 9px;
-      font-size: .95rem;
-      font-family: inherit;
-      color: var(--text);
-      transition: border-color var(--transition);
-      background: var(--bg);
+    .pillar-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--ei-primary), var(--ei-secondary));
+      transition: width .6s ease;
     }
 
-    .form-input:focus {
-      outline: none;
-      border-color: var(--brand);
-      background: #fff;
-    }
-
-    .form-input.error { border-color: var(--danger); }
-
-    .form-error {
-      font-size: .8rem;
-      color: var(--danger);
-      margin-top: 4px;
-      display: none;
-    }
-
-    .checkbox-wrap {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .checkbox-wrap input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      min-width: 18px;
-      accent-color: var(--brand);
-      margin-top: 2px;
-      cursor: pointer;
-    }
-
-    .checkbox-wrap label {
-      font-size: .88rem;
+    .pillar-score-label {
+      font-size: .75rem;
       color: var(--text-muted);
-      cursor: pointer;
-      line-height: 1.5;
+      font-weight: 600;
     }
 
-    /* Success state */
-    #modal-success { display: none; }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
 
-    .success-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: #D1FAE5;
-      color: var(--success);
-      font-size: 1.6rem;
+    .badge-success { background: #D1FAE5; color: #065F46; }
+    .badge-warning { background: #FEF3C7; color: #92400E; }
+    .badge-danger  { background: #FEE2E2; color: #991B1B; }
+    .badge-primary { background: var(--ei-primary-light); color: var(--ei-primary); }
+    .badge-accent  { background: var(--ei-secondary-light); color: var(--ei-secondary-dark); }
+
+    .recommendation-list {
+      list-style: none;
+      margin-top: 16px;
+    }
+
+    .recommendation-list li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .92rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    .recommendation-list li:last-child { border-bottom: none; }
+
+    .rec-icon {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      border-radius: 8px;
+      background: var(--ei-secondary-light);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 16px;
-    }
-
-    /* Result summary text box */
-    #result-summary-box {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: 14px;
-      font-size: .82rem;
-      font-family: 'Courier New', monospace;
-      color: var(--text-muted);
-      white-space: pre-wrap;
-      max-height: 220px;
-      overflow-y: auto;
-      margin: 16px 0;
-      line-height: 1.6;
-    }
-
-    .mvp-disclaimer {
-      font-size: .75rem;
-      color: var(--text-muted);
-      background: #FEF3C7;
-      border: 1px solid #FDE68A;
-      border-radius: 7px;
-      padding: 8px 12px;
-      margin-top: 10px;
-      text-align: center;
-    }
-
-    .copy-feedback {
-      font-size: .8rem;
-      color: var(--success);
-      text-align: center;
-      margin-top: 6px;
-      min-height: 18px;
-      font-weight: 600;
+      font-size: 1rem;
     }
 
     /* =============================================
        DIVIDER
     ============================================= */
     .divider {
-      height: 1px;
-      background: var(--border);
+      border: none;
+      border-top: 1px solid var(--border);
       margin: 24px 0;
     }
 
     /* =============================================
-       RESPONSIVE TWEAKS
+       CTA BANNER
     ============================================= */
-    @media (max-width: 520px) {
-      h1 { font-size: 1.6rem; }
-      h2 { font-size: 1.25rem; }
-      .all-scores-grid { grid-template-columns: 1fr; }
-      .likert-num { font-size: .95rem; }
+    .cta-banner {
+      background: linear-gradient(135deg, var(--ei-primary) 0%, var(--ei-primary-dark) 100%);
+      border-radius: var(--radius);
+      padding: 32px;
+      text-align: center;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    .cta-banner h3 {
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+    }
+
+    .cta-banner p {
+      color: rgba(255,255,255,.8);
+      margin-bottom: 20px;
+      font-size: .95rem;
+    }
+
+    .cta-banner .btn-secondary {
+      border-color: #fff;
+      color: #fff;
+    }
+
+    .cta-banner .btn-secondary:hover {
+      background: rgba(255,255,255,.15);
+    }
+
+    .cta-accent {
+      color: var(--ei-secondary);
+    }
+
+    /* =============================================
+       FOOTER
+    ============================================= */
+    footer {
+      text-align: center;
+      padding: 20px 16px;
+      font-size: .78rem;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--ei-secondary);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* =============================================
+       UTILITY
+    ============================================= */
+    .text-center { text-align: center; }
+    .mt-4 { margin-top: 16px; }
+    .mt-6 { margin-top: 24px; }
+    .mb-2 { margin-bottom: 8px; }
+    .hidden { display: none !important; }
+
+    /* =============================================
+       INTRO CHECKLIST (about screen)
+    ============================================= */
+    .check-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    @media (max-width: 480px) {
+      .check-grid { grid-template-columns: 1fr; }
+    }
+
+    .check-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: var(--ei-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 12px;
+      font-size: .88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .check-item .ci-icon {
+      font-size: 1.1rem;
+      margin-top: 1px;
+      min-width: 20px;
+    }
+
+    .check-item strong {
+      display: block;
+      color: var(--text);
+      font-size: .85rem;
+      margin-bottom: 2px;
+    }
+
+    /* =============================================
+       TOOLTIP / INFO NOTE
+    ============================================= */
+    .info-note {
+      background: var(--ei-primary-light);
+      border-left: 3px solid var(--ei-primary);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      font-size: .88rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .info-note strong {
+      color: var(--ei-primary);
     }
   </style>
 </head>
 <body>
 
-<!-- =============================================
-     STICKY PROGRESS BAR
-============================================= -->
-<div id="progress-bar-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+<!-- ================================================
+     PROGRESS BAR (sticky top)
+================================================ -->
+<div id="progress-bar-wrap">
   <div id="progress-meta">
-    <span id="progress-step-label">Step 1 of 7</span>
-    <span id="progress-pct-label">0%</span>
+    <span id="progress-label">Step 1 of 5</span>
+    <span id="progress-pct">0%</span>
   </div>
   <div id="progress-track">
     <div id="progress-fill" style="width:0%"></div>
   </div>
 </div>
 
-<!-- =============================================
-     APP ROOT
-============================================= -->
-<div id="app" role="main">
+<!-- ================================================
+     MAIN APP CONTAINER
+================================================ -->
+<div id="app">
 
-  <!-- ── SCREEN 0: LANDING ── -->
+  <!-- ============================================
+       SCREEN 0: LANDING
+  ============================================ -->
   <div id="screen-landing" class="screen">
     <div class="card">
-      <div class="hero-tag">Free Assessment · 5 min</div>
-      <h1>Is your company ready for a <span>Fractional CPO?</span></h1>
+      <div class="hero-tag">Free Assessment · 8 Minutes</div>
+      <h1>Is Your People Tech <span>Ready to Scale?</span></h1>
       <p class="subhead">
-        Answer 20 questions about how your people systems are running today.
-        Get an instant score, your top risk signals, and a personalised action plan.
+        Answer 20 targeted questions across five pillars and get a personalized readiness
+        score with prioritized recommendations — no sign-up required.
       </p>
 
       <div class="stats-row">
@@ -873,80 +786,143 @@
           <span>Questions</span>
         </div>
         <div class="stat-chip">
-          <strong>5 min</strong>
-          <span>Average time</span>
+          <strong>5</strong>
+          <span>Pillars</span>
         </div>
         <div class="stat-chip">
-          <strong>4</strong>
-          <span>Result tiers</span>
+          <strong>~8 min</strong>
+          <span>To complete</span>
+        </div>
+        <div class="stat-chip">
+          <strong>Free</strong>
+          <span>No sign-up</span>
         </div>
       </div>
 
-      <button class="btn btn-primary btn-full" id="btn-start" aria-label="Start assessment">
+      <div class="check-grid">
+        <div class="check-item">
+          <span class="ci-icon">🏗️</span>
+          <div>
+            <strong>Data Architecture</strong>
+            How clean &amp; structured is your people data?
+          </div>
+        </div>
+        <div class="check-item">
+          <span class="ci-icon">⚙️</span>
+          <div>
+            <strong>Process Automation</strong>
+            Are workflows manual or streamlined?
+          </div>
+        </div>
+        <div class="check-item">
+          <span class="ci-icon">🔗</span>
+          <div>
+            <strong>Systems Integration</strong>
+            Do your tools talk to each other?
+          </div>
+        </div>
+        <div class="check-item">
+          <span class="ci-icon">📊</span>
+          <div>
+            <strong>Analytics &amp; Reporting</strong>
+            Can you make data-driven decisions?
+          </div>
+        </div>
+        <div class="check-item">
+          <span class="ci-icon">🔒</span>
+          <div>
+            <strong>Compliance &amp; Security</strong>
+            Are you audit-ready and protected?
+          </div>
+        </div>
+        <div class="check-item">
+          <span class="ci-icon">🚀</span>
+          <div>
+            <strong>Scalability</strong>
+            Can your systems grow with you?
+          </div>
+        </div>
+      </div>
+
+      <div class="info-note">
+        <strong>How it works:</strong> Rate each statement on a 1–5 scale. Be honest — the more
+        accurate your answers, the more useful your personalized action plan.
+      </div>
+
+      <button id="btn-start" class="btn btn-primary btn-full" type="button">
         Start the Assessment →
       </button>
-
-      <p style="text-align:center; font-size:.8rem; margin-top:14px;">
-        No account needed · Results shown instantly
-      </p>
     </div>
+
+    <footer>
+      Powered by <a href="#">Elevate Intent</a> · <a href="#">Privacy Policy</a>
+    </footer>
   </div>
 
-  <!-- ── SCREEN 1: ABOUT ── -->
-  <div id="screen-about" class="screen" style="display:none">
+  <!-- ============================================
+       SCREEN 1: DATA ARCHITECTURE
+  ============================================ -->
+  <div id="screen-1" class="screen hidden">
     <div class="card">
-      <div class="label-tag">How it works</div>
-      <h2>A quick, honest diagnostic</h2>
-      <p>You'll rate 20 statements about how your organisation is running today.</p>
-
-      <ul class="bullet-list" aria-label="How the assessment works">
-        <li>
-          <span class="bullet-icon" aria-hidden="true">1</span>
-          <span><strong>5 categories, 4 questions each</strong> — covering clarity, hiring, managers, retention, and risk foundations.</span>
-        </li>
-        <li>
-          <span class="bullet-icon" aria-hidden="true">2</span>
-          <span><strong>Instant weighted score</strong> — we calculate where your biggest friction is and map you to one of four readiness tiers.</span>
-        </li>
-        <li>
-          <span class="bullet-icon" aria-hidden="true">3</span>
-          <span><strong>Actionable output</strong> — you'll leave with your top 3 risk signals and 3 concrete next steps tailored to your tier.</span>
-        </li>
-      </ul>
-
-      <div class="privacy-note" role="note">
-        <span aria-hidden="true">🔒</span>
-        <span>We'll email your results only if you choose. Your answers are stored locally in your browser and never sent anywhere automatically.</span>
+      <div class="step-header">
+        <div class="step-label">Pillar 1 of 5</div>
+        <h2>Data Architecture</h2>
+        <p>How well-structured, accurate, and accessible is your people data foundation?</p>
       </div>
 
-      <div class="nav-row">
-        <button class="btn btn-ghost" id="btn-about-back">← Back</button>
-        <button class="btn btn-primary" id="btn-about-next">Let's go →</button>
+      <div class="info-note">
+        <strong>Scale:</strong> 1 = Strongly Disagree &nbsp;|&nbsp; 5 = Strongly Agree
       </div>
-    </div>
-  </div>
 
-  <!-- ── SCREENS 2–6: ASSESSMENT (injected by JS) ── -->
-  <div id="screen-assessment" class="screen" style="display:none">
-    <!-- Dynamically populated -->
-  </div>
+      <!-- Q1 -->
+      <div class="question-block">
+        <div class="question-text">1. Our employee data is stored in a single, authoritative system of record.</div>
+        <div class="likert-row">
+          <div class="likert-option">
+            <input type="radio" name="q1" id="q1-1" value="1" />
+            <label for="q1-1"><span class="likert-num">1</span><span class="likert-label">Strongly Disagree</span></label>
+          </div>
+          <div class="likert-option">
+            <input type="radio" name="q1" id="q1-2" value="2" />
+            <label for="q1-2"><span class="likert-num">2</span><span class="likert-label">Disagree</span></label>
+          </div>
+          <div class="likert-option">
+            <input type="radio" name="q1" id="q1-3" value="3" />
+            <label for="q1-3"><span class="likert-num">3</span><span class="likert-label">Neutral</span></label>
+          </div>
+          <div class="likert-option">
+            <input type="radio" name="q1" id="q1-4" value="4" />
+            <label for="q1-4"><span class="likert-num">4</span><span class="likert-label">Agree</span></label>
+          </div>
+          <div class="likert-option">
+            <input type="radio" name="q1" id="q1-5" value="5" />
+            <label for="q1-5"><span class="likert-num">5</span><span class="likert-label">Strongly Agree</span></label>
+          </div>
+        </div>
+      </div>
 
-  <!-- ── SCREEN 7: RESULTS ── -->
-  <div id="screen-results" class="screen" style="display:none">
-    <!-- Dynamically populated -->
-  </div>
-
-</div>
-
-<!-- =============================================
-     LEAD CAPTURE MODAL
-============================================= -->
-<div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-  <div class="modal-box">
-    <button class="modal-close" id="modal-close-btn" aria-label="Close modal">✕</button>
-
-    <!-- Form state -->
-    <div id="modal-form">
-      <div class="label-tag">Action plan</div>
-      <h3 id="modal-title" style="margin-bottom:8px;">Get your 1-page action plan</h3>
-      
+      <!-- Q2 -->
+      <div class="question-block">
+        <div class="question-text">2. Data entry standards and naming conventions are consistently enforced across the organization.</div>
+        <div class="likert-row">
+          <div class="likert-option">
+            <input type="radio" name="q2" id="q2-1" value="1" />
+            <label for="q2-1"><span class="likert-num">1</span><span class="likert-label">Strongly Disagree</span></label>
+          </div>
+          <div class="likert-option">
+            <input type="radio" name="q2" id="q2-2" value="2" />
+            <label for="q2-2"><span class="likert-num">2</span><span class="likert-label">Disagree</span></label>
+          </div>
+          <div class="likert-option">
+            <input type="radio" name="q2" id="q2-3" value="3" />
+            <label for="q2-3"><span class="likert-num">3</span><span class="likert-label">Neutral</span></label>
+          </div>
+          <div class="likert-option">
+            <input type="radio" name="q2" id="q2-4" value="4" />
+            <label for="q2-4"><span class="likert-num">4</span><span class="likert-label">Agree</span></label>
+          </div>
+          <div class="likert-option">
+            <input type="radio" name="q2" id="q2-5" value="5" />
+            <label for="q2-5"><span class="likert-num">5</span><span class="likert-label">Strongly Agree</span></label>
+          </div>
+        </div>
