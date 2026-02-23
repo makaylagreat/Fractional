@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -739,7 +738,39 @@
   </style>
 </head>
 <body>
+/* --- Hide the pillar cards (button-looking tiles) --- */
+.check-grid,
+.pillars,
+.pillar-grid,
+.feature-grid,
+.cards-grid,
+.stats-grid,
+.tile-grid {
+  display: none !important;
+}
 
+/* --- Remove decorative wave / color swash backgrounds --- */
+.wave,
+.waves,
+.hero-wave,
+.bg-wave,
+.color-wave,
+.swoosh,
+.swash,
+.gradient-wave,
+.hero::before,
+.hero::after,
+.card::before,
+.card::after {
+  display: none !important;
+  background: none !important;
+  content: none !important;
+}
+
+/* If a section is using a background image/gradient, neutralize it */
+.hero, body {
+  background-image: none !important;
+}
 <!-- ================================================
      PROGRESS BAR (sticky top)
 ================================================ -->
