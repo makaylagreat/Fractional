@@ -249,6 +249,16 @@
                     <input type="radio" name="${questionId}" value="5" onchange="updateAnswers('${questionId}')"> 5 
                 `;
             });
+
+            // Restore previous answers if they exist
+            questions[category].forEach((_, index) => {
+                const questionId = `${category}${index + 1}`;
+                const savedValue = answers[questionId];
+                if (savedValue !== undefined) {
+                    document.querySelector(`input[name="${questionId}"][value="${savedValue}"]`).checked = true;
+                }
+            });
+
             document.getElementById('step-info').innerText = `Step ${currentStep + 1} of ${totalSteps}`;
             progressBar.style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
             nextBtn.disabled = !isCurrentStepAnswered();
@@ -264,7 +274,7 @@
             return questions[categories[currentStep]].every((_, index) => {
                 const questionId = `${categories[currentStep]}${index + 1}`;
                 return answers[questionId] !== undefined;
-            });
+            }) || currentStep === totalSteps - 1; // Allow final step to proceed
         }
 
         function calculateResults() {
