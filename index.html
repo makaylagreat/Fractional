@@ -96,6 +96,7 @@
 
         <div id="assessment" class="step hidden">
             <h2 id="category-title"></h2>
+            <p><strong>Rating Scale:</strong> 1 = Strongly Disagree, 2 = Slightly Disagree, 3 = Somewhat Agree, 4 = Mostly Agree, 5 = Strongly Agree</p>
             <div id="questions"></div>
             <button id="back-btn">Back</button>
             <button id="next-btn" disabled>Next</button>
@@ -135,31 +136,31 @@
 
     <script>
         const questions = {
-            A: [
+            "Clarity & Operating Model": [
                 "Decisions get re-litigated because decision rights aren’t clear.",
                 "Ownership is fuzzy, and multiple people think they’re responsible (or no one does).",
                 "Roles have evolved, but expectations and success metrics haven’t been updated.",
                 "Cross-team handoffs regularly break because who does what isn’t explicit."
             ],
-            B: [
+            "Hiring & Ramp": [
                 "We’ve had a costly mishire in the last 6–9 months (or we’re worried we’re close).",
                 "New hires take longer than 60–90 days to become meaningfully productive.",
                 "Interviewing is inconsistent and different interviewers evaluate different things.",
                 "Onboarding quality varies widely by manager or team."
             ],
-            C: [
+            "Managers & Performance": [
                 "Managers avoid hard conversations, so issues linger too long.",
                 "High performers are carrying too much because low performance isn’t addressed quickly.",
                 "Great performance isn’t clearly defined by role, level, or function.",
                 "Managers need more support coaching, feedback, delegation, and prioritization."
             ],
-            D: [
+            "Retention & Culture": [
                 "We’ve lost, or nearly lost, a key employee unexpectedly in the last 12 months.",
                 "We don’t have a reliable way to understand why people stay or leave.",
                 "Recognition and growth opportunities feel inconsistent across teams.",
                 "Culture and communication feel different depending on which leader you work for."
             ],
-            E: [
+            "Risk & Foundations": [
                 "We’re one people issue (performance, conflict, termination) away from chaos.",
                 "Policies and processes are ad hoc or unclear, creating inconsistency and risk.",
                 "People data (headcount, compensation, performance, attrition) is messy or not visible, so decisions are slower.",
@@ -168,11 +169,11 @@
         };
 
         const weights = {
-            A: 0.25,
-            B: 0.20,
-            C: 0.25,
-            D: 0.15,
-            E: 0.15
+            "Clarity & Operating Model": 0.25,
+            "Hiring & Ramp": 0.20,
+            "Managers & Performance": 0.25,
+            "Retention & Culture": 0.15,
+            "Risk & Foundations": 0.15
         };
 
         let currentStep = 0;
@@ -235,18 +236,17 @@
 
         function loadAssessment() {
             const category = categories[currentStep];
-            document.getElementById('category-title').innerText = `${category} Questions`;
-            const questionsContainer = document.getElementById('questions');
-            questionsContainer.innerHTML = '';
+            document.getElementById('category-title').innerText = category;
+            document.getElementById('questions').innerHTML = '';
             questions[category].forEach((question, index) => {
                 const questionId = `${category}${index + 1}`;
-                questionsContainer.innerHTML += `
+                document.getElementById('questions').innerHTML += `
                     <p>${question}</p>
-                    <input type="radio" name="${questionId}" value="0" onchange="updateAnswers('${questionId}')"> 0 
                     <input type="radio" name="${questionId}" value="1" onchange="updateAnswers('${questionId}')"> 1 
                     <input type="radio" name="${questionId}" value="2" onchange="updateAnswers('${questionId}')"> 2 
                     <input type="radio" name="${questionId}" value="3" onchange="updateAnswers('${questionId}')"> 3 
                     <input type="radio" name="${questionId}" value="4" onchange="updateAnswers('${questionId}')"> 4 
+                    <input type="radio" name="${questionId}" value="5" onchange="updateAnswers('${questionId}')"> 5 
                 `;
             });
             document.getElementById('step-info').innerText = `Step ${currentStep + 1} of ${totalSteps}`;
@@ -286,7 +286,7 @@
         }
 
         function determineTier(overallScore, scores) {
-            if (scores.E >= 80 || scores.C >= 85) return "Urgent";
+            if (scores["Risk & Foundations"] >= 80 || scores["Managers & Performance"] >= 85) return "Urgent";
             if (overallScore < 25) return "Not Yet";
             if (overallScore < 50) return "Soon";
             if (overallScore < 75) return "Yes";
