@@ -1,949 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>People Systems Readiness Assessment</title>
-  <style>
-    /* =============================================
-       RESET & BASE
-    ============================================= */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --ei-primary:   #445953;
-      --ei-primary-dark: #334440;
-      --ei-primary-light: #EBF0EF;
-      --ei-secondary: #D57A4C;
-      --ei-secondary-dark: #B8623A;
-      --ei-secondary-light: #FBF0EA;
-      --ei-ink:       #0F172A;
-      --ei-bg:        #F8FAFC;
-      --success:      #10B981;
-      --warning:      #F59E0B;
-      --danger:       #EF4444;
-      --text:         #0F172A;
-      --text-muted:   #64748B;
-      --border:       #E2E8F0;
-      --card:         #FFFFFF;
-      --radius:       14px;
-      --shadow:       0 4px 24px rgba(68,89,83,.10);
-      --transition:   .22s ease;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--ei-bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* =============================================
-       PROGRESS BAR (sticky)
-    ============================================= */
-    #progress-bar-wrap {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      width: 100%;
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 20px;
-      display: none;
-    }
-
-    #progress-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: .78rem;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      font-weight: 500;
-    }
-
-    #progress-track {
-      width: 100%;
-      height: 6px;
-      background: var(--border);
-      border-radius: 99px;
-      overflow: hidden;
-    }
-
-    #progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--ei-primary), var(--ei-secondary));
-      border-radius: 99px;
-      transition: width .4s ease;
-    }
-
-    /* =============================================
-       LAYOUT WRAPPER
-    ============================================= */
-    #app {
-      width: 100%;
-      max-width: 680px;
-      padding: 24px 16px 60px;
-      flex: 1;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* =============================================
-       CARD
-    ============================================= */
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 36px 32px;
-      margin-bottom: 20px;
-      position: relative;
-      z-index: 1;
-    }
-
-    @media (max-width: 480px) {
-      .card { padding: 28px 20px; }
-    }
-
-    /* =============================================
-       SCREENS (fade transition)
-    ============================================= */
-    .screen {
-      animation: fadeIn .3s ease both;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* =============================================
-       TYPOGRAPHY
-    ============================================= */
-    h1 { font-size: 2rem; font-weight: 800; line-height: 1.2; }
-    h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; }
-    h3 { font-size: 1.1rem; font-weight: 700; }
-    p  { line-height: 1.7; color: var(--text-muted); }
-
-    .subhead {
-      font-size: 1.05rem;
-      color: var(--text-muted);
-      margin-top: 10px;
-      line-height: 1.6;
-    }
-
-    .label-tag {
-      display: inline-block;
-      font-size: .72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      padding: 3px 10px;
-      border-radius: 99px;
-      background: var(--ei-primary-light);
-      color: var(--ei-primary);
-      margin-bottom: 14px;
-    }
-
-    /* =============================================
-       BUTTONS
-    ============================================= */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      padding: 13px 26px;
-      border-radius: 10px;
-      font-size: .95rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: transform var(--transition), box-shadow var(--transition), background var(--transition), opacity var(--transition);
-      text-decoration: none;
-      position: relative;
-      z-index: 2;
-      pointer-events: auto;
-    }
-
-    .btn:focus-visible {
-      outline: 3px solid var(--ei-secondary);
-      outline-offset: 3px;
-    }
-
-    .btn-primary {
-      background: var(--ei-primary);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(68,89,83,.30);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background: var(--ei-primary-dark);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(68,89,83,.38);
-    }
-
-    .btn-primary:focus-visible {
-      outline: 3px solid var(--ei-secondary);
-      outline-offset: 3px;
-    }
-
-    .btn-primary:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--ei-primary);
-      border: 2px solid var(--ei-primary);
-    }
-
-    .btn-secondary:hover {
-      background: var(--ei-primary-light);
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary:focus-visible {
-      outline: 3px solid var(--ei-secondary);
-      outline-offset: 3px;
-    }
-
-    .btn-ghost {
-      background: var(--ei-bg);
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-    }
-
-    .btn-ghost:hover {
-      background: var(--border);
-      color: var(--text);
-    }
-
-    .btn-ghost:focus-visible {
-      outline: 3px solid var(--ei-secondary);
-      outline-offset: 3px;
-    }
-
-    .btn-success {
-      background: var(--success);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(16,185,129,.3);
-    }
-
-    .btn-success:hover {
-      background: #059669;
-      transform: translateY(-1px);
-    }
-
-    .btn-sm {
-      padding: 8px 16px;
-      font-size: .85rem;
-      border-radius: 8px;
-    }
-
-    .btn-full { width: 100%; }
-
-    /* =============================================
-       NAV ROW
-    ============================================= */
-    .nav-row {
-      display: flex;
-      gap: 12px;
-      margin-top: 28px;
-      align-items: center;
-    }
-
-    .nav-row .btn-primary { flex: 1; }
-
-    /* =============================================
-       LIKERT QUESTION
-    ============================================= */
-    .question-block {
-      margin-bottom: 28px;
-    }
-
-    .question-block:last-child { margin-bottom: 0; }
-
-    .question-text {
-      font-size: .97rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 14px;
-      line-height: 1.5;
-    }
-
-    .likert-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .likert-option {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .likert-option input[type="radio"] {
-      position: absolute;
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .likert-option label {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      padding: 10px 6px;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      cursor: pointer;
-      text-align: center;
-      transition: border-color var(--transition), background var(--transition), transform var(--transition);
-      min-width: 44px;
-    }
-
-    .likert-option label:hover {
-      border-color: var(--ei-primary);
-      background: var(--ei-primary-light);
-      transform: translateY(-2px);
-    }
-
-    .likert-option input[type="radio"]:focus-visible + label {
-      outline: 3px solid var(--ei-secondary);
-      outline-offset: 2px;
-    }
-
-    .likert-option input[type="radio"]:checked + label {
-      border-color: var(--ei-primary);
-      background: var(--ei-primary);
-      color: #fff;
-    }
-
-    .likert-num {
-      font-size: 1.1rem;
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    .likert-label {
-      font-size: .65rem;
-      font-weight: 500;
-      line-height: 1.2;
-      color: inherit;
-      opacity: .85;
-    }
-
-    .likert-option input[type="radio"]:checked + label .likert-label {
-      opacity: 1;
-      color: rgba(255,255,255,.9);
-    }
-
-    .scale-legend {
-      display: flex;
-      justify-content: space-between;
-      font-size: .72rem;
-      color: var(--text-muted);
-      margin-top: 6px;
-      padding: 0 2px;
-    }
-
-    /* =============================================
-       LANDING SCREEN
-    ============================================= */
-    #screen-landing .hero-tag {
-      display: inline-block;
-      background: linear-gradient(135deg, var(--ei-primary), var(--ei-secondary));
-      color: #fff;
-      font-size: .78rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      padding: 4px 14px;
-      border-radius: 99px;
-      margin-bottom: 18px;
-    }
-
-    #screen-landing h1 {
-      color: var(--text);
-      margin-bottom: 14px;
-    }
-
-    #screen-landing h1 span {
-      background: linear-gradient(135deg, var(--ei-primary), var(--ei-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .stats-row {
-      display: flex;
-      gap: 16px;
-      margin: 28px 0;
-      flex-wrap: wrap;
-    }
-
-    .stat-chip {
-      flex: 1;
-      min-width: 120px;
-      background: var(--ei-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 12px;
-      text-align: center;
-    }
-
-    .stat-chip strong {
-      display: block;
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--ei-primary);
-    }
-
-    .stat-chip span {
-      font-size: .78rem;
-      color: var(--text-muted);
-    }
-
-    /* =============================================
-       ABOUT / BULLET LIST
-    ============================================= */
-    .bullet-list {
-      list-style: none;
-      margin: 20px 0;
-    }
-
-    .bullet-list li {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: .95rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-
-    .bullet-list li:last-child { border-bottom: none; }
-
-    .bullet-icon {
-      width: 28px;
-      height: 28px;
-      min-width: 28px;
-      border-radius: 8px;
-      background: var(--ei-primary-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .9rem;
-    }
-
-    /* =============================================
-       STEP HEADER
-    ============================================= */
-    .step-header {
-      margin-bottom: 28px;
-    }
-
-    .step-label {
-      font-size: .75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--ei-secondary);
-      margin-bottom: 6px;
-    }
-
-    .step-header h2 {
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-
-    .step-header p {
-      font-size: .92rem;
-    }
-
-    /* =============================================
-       RESULTS SCREEN
-    ============================================= */
-    .score-ring-wrap {
-      display: flex;
-      justify-content: center;
-      margin: 24px 0 30px;
-    }
-
-    .score-ring {
-      position: relative;
-      width: 140px;
-      height: 140px;
-    }
-
-    .score-ring svg {
-      transform: rotate(-90deg);
-    }
-
-    .score-ring-text {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .score-ring-text .score-num {
-      font-size: 2rem;
-      font-weight: 900;
-      color: var(--ei-primary);
-      line-height: 1;
-    }
-
-    .score-ring-text .score-denom {
-      font-size: .78rem;
-      color: var(--text-muted);
-    }
-
-    .pillar-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin: 24px 0;
-    }
-
-    @media (max-width: 480px) {
-      .pillar-grid { grid-template-columns: 1fr; }
-    }
-
-    .pillar-card {
-      background: var(--ei-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px;
-    }
-
-    .pillar-card h4 {
-      font-size: .85rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-
-    .pillar-bar-track {
-      width: 100%;
-      height: 6px;
-      background: var(--border);
-      border-radius: 99px;
-      overflow: hidden;
-      margin-bottom: 6px;
-    }
-
-    .pillar-bar-fill {
-      height: 100%;
-      border-radius: 99px;
-      background: linear-gradient(90deg, var(--ei-primary), var(--ei-secondary));
-      transition: width .6s ease;
-    }
-
-    .pillar-score-label {
-      font-size: .75rem;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 99px;
-      font-size: .72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-    }
-
-    .badge-success { background: #D1FAE5; color: #065F46; }
-    .badge-warning { background: #FEF3C7; color: #92400E; }
-    .badge-danger  { background: #FEE2E2; color: #991B1B; }
-    .badge-primary { background: var(--ei-primary-light); color: var(--ei-primary); }
-    .badge-accent  { background: var(--ei-secondary-light); color: var(--ei-secondary-dark); }
-
-    .recommendation-list {
-      list-style: none;
-      margin-top: 16px;
-    }
-
-    .recommendation-list li {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: .92rem;
-      line-height: 1.6;
-      color: var(--text-muted);
-    }
-
-    .recommendation-list li:last-child { border-bottom: none; }
-
-    .rec-icon {
-      width: 32px;
-      height: 32px;
-      min-width: 32px;
-      border-radius: 8px;
-      background: var(--ei-secondary-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-    }
-
-    /* =============================================
-       DIVIDER
-    ============================================= */
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 24px 0;
-    }
-
-    /* =============================================
-       CTA BANNER
-    ============================================= */
-    .cta-banner {
-      background: linear-gradient(135deg, var(--ei-primary) 0%, var(--ei-primary-dark) 100%);
-      border-radius: var(--radius);
-      padding: 32px;
-      text-align: center;
-      color: #fff;
-      margin-bottom: 20px;
-    }
-
-    .cta-banner h3 {
-      font-size: 1.25rem;
-      margin-bottom: 10px;
-    }
-
-    .cta-banner p {
-      color: rgba(255,255,255,.8);
-      margin-bottom: 20px;
-      font-size: .95rem;
-    }
-
-    .cta-banner .btn-secondary {
-      border-color: #fff;
-      color: #fff;
-    }
-
-    .cta-banner .btn-secondary:hover {
-      background: rgba(255,255,255,.15);
-    }
-
-    .cta-accent {
-      color: var(--ei-secondary);
-    }
-
-    /* =============================================
-       FOOTER
-    ============================================= */
-    footer {
-      text-align: center;
-      padding: 20px 16px;
-      font-size: .78rem;
-      color: var(--text-muted);
-    }
-
-    footer a {
-      color: var(--ei-secondary);
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-
-    /* =============================================
-       UTILITY
-    ============================================= */
-    .text-center { text-align: center; }
-    .mt-4 { margin-top: 16px; }
-    .mt-6 { margin-top: 24px; }
-    .mb-2 { margin-bottom: 8px; }
-    .hidden { display: none !important; }
-
-    /* =============================================
-       INTRO CHECKLIST (about screen)
-    ============================================= */
-    .check-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin: 20px 0;
-    }
-
-    @media (max-width: 480px) {
-      .check-grid { grid-template-columns: 1fr; }
-    }
-
-    .check-item {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      background: var(--ei-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 12px;
-      font-size: .88rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-
-    .check-item .ci-icon {
-      font-size: 1.1rem;
-      margin-top: 1px;
-      min-width: 20px;
-    }
-
-    .check-item strong {
-      display: block;
-      color: var(--text);
-      font-size: .85rem;
-      margin-bottom: 2px;
-    }
-
-    /* =============================================
-       TOOLTIP / INFO NOTE
-    ============================================= */
-    .info-note {
-      background: var(--ei-primary-light);
-      border-left: 3px solid var(--ei-primary);
-      border-radius: 0 8px 8px 0;
-      padding: 12px 16px;
-      font-size: .88rem;
-      color: var(--text-muted);
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-
-    .info-note strong {
-      color: var(--ei-primary);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Do I need a Fractional Head of People?</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .progress-bar {
+            position: sticky;
+            top: 0;
+            background-color: #007bff;
+            height: 5px;
+            transition: width 0.4s ease;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+        .results {
+            display: none;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+        }
+    </style>
 </head>
 <body>
-/* --- Hide the pillar cards (button-looking tiles) --- */
-.check-grid,
-.pillars,
-.pillar-grid,
-.feature-grid,
-.cards-grid,
-.stats-grid,
-.tile-grid {
-  display: none !important;
-}
+    <div class="container">
+        <div class="progress-bar" id="progress-bar"></div>
+        <div id="landing" class="step">
+            <h1>Do I need a Fractional Head of People?</h1>
+            <h2>Take this assessment to find out!</h2>
+            <button id="start-btn">Start</button>
+        </div>
 
-/* --- Remove decorative wave / color swash backgrounds --- */
-.wave,
-.waves,
-.hero-wave,
-.bg-wave,
-.color-wave,
-.swoosh,
-.swash,
-.gradient-wave,
-.hero::before,
-.hero::after,
-.card::before,
-.card::after {
-  display: none !important;
-  background: none !important;
-  content: none !important;
-}
+        <div id="about" class="step hidden">
+            <h2>About This Assessment</h2>
+            <ul>
+                <li>Assess your current people systems.</li>
+                <li>Identify potential risks and gaps.</li>
+                <li>Receive tailored recommendations.</li>
+            </ul>
+            <p><strong>Privacy Note:</strong> We’ll email your results only if you choose.</p>
+            <button id="next-to-assessment">Next</button>
+        </div>
 
-/* If a section is using a background image/gradient, neutralize it */
-.hero, body {
-  background-image: none !important;
-}
-<!-- ================================================
-     PROGRESS BAR (sticky top)
-================================================ -->
-<div id="progress-bar-wrap">
-  <div id="progress-meta">
-    <span id="progress-label">Step 1 of 5</span>
-    <span id="progress-pct">0%</span>
-  </div>
-  <div id="progress-track">
-    <div id="progress-fill" style="width:0%"></div>
-  </div>
-</div>
+        <div id="assessment" class="step hidden">
+            <h2 id="category-title"></h2>
+            <div id="questions"></div>
+            <button id="back-btn">Back</button>
+            <button id="next-btn" disabled>Next</button>
+            <p id="step-info"></p>
+        </div>
 
-<!-- ================================================
-     MAIN APP CONTAINER
-================================================ -->
-<div id="app">
+        <div id="results" class="results hidden">
+            <h2>Your Results</h2>
+            <div id="result-tier"></div>
+            <div id="overall-score"></div>
+            <div id="top-risk-signals"></div>
+            <div id="recommended-actions"></div>
+            <button id="email-results-btn">Email me my 1-page action plan</button>
+            <button id="restart-btn">Restart</button>
+        </div>
 
-  <!-- ============================================
-       SCREEN 0: LANDING
-  ============================================ -->
-  <div id="screen-landing" class="screen">
-    <div class="card">
-      <div class="hero-tag">Free Assessment · 8 Minutes</div>
-      <h1>Is Your People Tech <span>Ready to Scale?</span></h1>
-      <p class="subhead">
-        Answer 20 targeted questions across five pillars and get a personalized readiness
-        score with prioritized recommendations — no sign-up required.
-      </p>
+        <div class="modal" id="lead-capture-modal">
+            <div class="modal-content">
+                <h3>Lead Capture</h3>
+                <label for="first-name">First Name (optional):</label>
+                <input type="text" id="first-name">
 
-      <div class="stats-row">
-        <div class="stat-chip">
-          <strong>20</strong>
-          <span>Questions</span>
-        </div>
-        <div class="stat-chip">
-          <strong>5</strong>
-          <span>Pillars</span>
-        </div>
-        <div class="stat-chip">
-          <strong>~8 min</strong>
-          <span>To complete</span>
-        </div>
-        <div class="stat-chip">
-          <strong>Free</strong>
-          <span>No sign-up</span>
-        </div>
-      </div>
+                <label for="email">Email (required):</label>
+                <input type="email" id="email" required>
 
-      <div class="check-grid">
-        <div class="check-item">
-          <span class="ci-icon">🏗️</span>
-          <div>
-            <strong>Data Architecture</strong>
-            How clean &amp; structured is your people data?
-          </div>
-        </div>
-        <div class="check-item">
-          <span class="ci-icon">⚙️</span>
-          <div>
-            <strong>Process Automation</strong>
-            Are workflows manual or streamlined?
-          </div>
-        </div>
-        <div class="check-item">
-          <span class="ci-icon">🔗</span>
-          <div>
-            <strong>Systems Integration</strong>
-            Do your tools talk to each other?
-          </div>
-        </div>
-        <div class="check-item">
-          <span class="ci-icon">📊</span>
-          <div>
-            <strong>Analytics &amp; Reporting</strong>
-            Can you make data-driven decisions?
-          </div>
-        </div>
-        <div class="check-item">
-          <span class="ci-icon">🔒</span>
-          <div>
-            <strong>Compliance &amp; Security</strong>
-            Are you audit-ready and protected?
-          </div>
-        </div>
-        <div class="check-item">
-          <span class="ci-icon">🚀</span>
-          <div>
-            <strong>Scalability</strong>
-            Can your systems grow with you?
-          </div>
-        </div>
-      </div>
+                <label>
+                    <input type="checkbox" id="insights-checkbox" checked>
+                    Send me occasional insights on people systems (max 1/month).
+                </label>
 
-      <div class="info-note">
-        <strong>How it works:</strong> Rate each statement on a 1–5 scale. Be honest — the more
-        accurate your answers, the more useful your personalized action plan.
-      </div>
-
-      <button id="btn-start" class="btn btn-primary btn-full" type="button">
-        Start the Assessment →
-      </button>
+                <button id="submit-email">Submit</button>
+                <p id="success-message" class="hidden">Done — check your inbox.</p>
+                <p><small>MVP: Email sending is disabled in this demo.</small></p>
+            </div>
+        </div>
     </div>
 
-    <footer>
-      Powered by <a href="#">Elevate Intent</a> · <a href="#">Privacy Policy</a>
-    </footer>
-  </div>
+    <script>
+        const questions = {
+            A: [
+                "Decisions get re-litigated because decision rights aren’t clear.",
+                "Ownership is fuzzy, and multiple people think they’re responsible (or no one does).",
+                "Roles have evolved, but expectations and success metrics haven’t been updated.",
+                "Cross-team handoffs regularly break because who does what isn’t explicit."
+            ],
+            B: [
+                "We’ve had a costly mishire in the last 6–9 months (or we’re worried we’re close).",
+                "New hires take longer than 60–90 days to become meaningfully productive.",
+                "Interviewing is inconsistent and different interviewers evaluate different things.",
+                "Onboarding quality varies widely by manager or team."
+            ],
+            C: [
+                "Managers avoid hard conversations, so issues linger too long.",
+                "High performers are carrying too much because low performance isn’t addressed quickly.",
+                "Great performance isn’t clearly defined by role, level, or function.",
+                "Managers need more support coaching, feedback, delegation, and prioritization."
+            ],
+            D: [
+                "We’ve lost, or nearly lost, a key employee unexpectedly in the last 12 months.",
+                "We don’t have a reliable way to understand why people stay or leave.",
+                "Recognition and growth opportunities feel inconsistent across teams.",
+                "Culture and communication feel different depending on which leader you work for."
+            ],
+            E: [
+                "We’re one people issue (performance, conflict, termination) away from chaos.",
+                "Policies and processes are ad hoc or unclear, creating inconsistency and risk.",
+                "People data (headcount, compensation, performance, attrition) is messy or not visible, so decisions are slower.",
+                "Access, onboarding, or compliance workflows aren’t consistently controlled or documented."
+            ]
+        };
 
-  <!-- ============================================
-       SCREEN 1: DATA ARCHITECTURE
-  ============================================ -->
-  <div id="screen-1" class="screen hidden">
-    <div class="card">
-      <div class="step-header">
-        <div class="step-label">Pillar 1 of 5</div>
-        <h2>Data Architecture</h2>
-        <p>How well-structured, accurate, and accessible is your people data foundation?</p>
-      </div>
+        const weights = {
+            A: 0.25,
+            B: 0.20,
+            C: 0.25,
+            D: 0.15,
+            E: 0.15
+        };
 
-      <div class="info-note">
-        <strong>Scale:</strong> 1 = Strongly Disagree &nbsp;|&nbsp; 5 = Strongly Agree
-      </div>
+        let currentStep = 0;
+        const answers = {};
+        const categories = Object.keys(questions);
+        const totalSteps = categories.length;
 
-      <!-- Q1 -->
-      <div class="question-block">
-        <div class="question-text">1. Our employee data is stored in a single, authoritative system of record.</div>
-        <div class="likert-row">
-          <div class="likert-option">
-            <input type="radio" name="q1" id="q1-1" value="1" />
-            <label for="q1-1"><span class="likert-num">1</span><span class="likert-label">Strongly Disagree</span></label>
-          </div>
-          <div class="likert-option">
-            <input type="radio" name="q1" id="q1-2" value="2" />
-            <label for="q1-2"><span class="likert-num">2</span><span class="likert-label">Disagree</span></label>
-          </div>
-          <div class="likert-option">
-            <input type="radio" name="q1" id="q1-3" value="3" />
-            <label for="q1-3"><span class="likert-num">3</span><span class="likert-label">Neutral</span></label>
-          </div>
-          <div class="likert-option">
-            <input type="radio" name="q1" id="q1-4" value="4" />
-            <label for="q1-4"><span class="likert-num">4</span><span class="likert-label">Agree</span></label>
-          </div>
-          <div class="likert-option">
-            <input type="radio" name="q1" id="q1-5" value="5" />
-            <label for="q1-5"><span class="likert-num">5</span><span class="likert-label">Strongly Agree</span></label>
-          </div>
-        </div>
-      </div>
+        const progressBar = document.getElementById('progress-bar');
+        const startBtn = document.getElementById('start-btn');
+        const nextToAssessmentBtn = document.getElementById('next-to-assessment');
+        const nextBtn = document.getElementById('next-btn');
+        const backBtn = document.getElementById('back-btn');
+        const resultsSection = document.getElementById('results');
+        const emailResultsBtn = document.getElementById('email-results-btn');
+        const leadCaptureModal = document.getElementById('lead-capture-modal');
+        const submitEmailBtn = document.getElementById('submit-email');
+        const emailInput = document.getElementById('email');
+        const successMessage = document.getElementById('success-message');
+        const restartBtn = document.getElementById('restart-btn');
 
-      <!-- Q2 -->
-      <div class="question-block">
-        <div class="question-text">2. Data entry standards and naming conventions are consistently enforced across the organization.</div>
-        <div class="likert-row">
-          <div class="likert-option">
-            <input type="radio" name="q2" id="q2-1" value="1" />
-            <label for="q2-1"><span class="likert-num">1</span><span class="likert-label">Strongly Disagree</span></label>
-          </div>
-          <div class="likert-option">
-            <input type="radio" name="q2" id="q2-2" value="2" />
-            <label for="q2-2"><span class="likert-num">2</span><span class="likert-label">Disagree</span></label>
-          </div>
-          <div class="likert-option">
-            <input type="radio" name="q2" id="q2-3" value="3" />
-            <label for="q2-3"><span class="likert-num">3</span><span class="likert-label">Neutral</span></label>
-          </div>
-          <div class="likert-option">
-            <input type="radio" name="q2" id="q2-4" value="4" />
-            <label for="q2-4"><span class="likert-num">4</span><span class="likert-label">Agree</span></label>
-          </div>
-          <div class="likert-option">
-            <input type="radio" name="q2" id="q2-5" value="5" />
-            <label for="q2-5"><span class="likert-num">5</span><span class="likert-label">Strongly Agree</span></label>
-          </div>
-        </div>
+        startBtn.addEventListener('click', () => {
+            document.getElementById('landing').classList.add('hidden');
+            document.getElementById('about').classList.remove('hidden');
+        });
+
+        nextToAssessmentBtn.addEventListener('click', () => {
+            document.getElementById('about').classList.add('hidden');
+            document.getElementById('assessment').classList.remove('hidden');
+            loadAssessment();
+        });
+
+        backBtn.addEventListener('click', () => {
+            if (currentStep > 0) {
+                currentStep--;
+                loadAssessment();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps - 1) {
+                currentStep++;
+                loadAssessment();
+            } else {
+                calculateResults();
+            }
+        });
+
+        submitEmailBtn.addEventListener('click', () => {
+            if (validateEmail(emailInput.value)) {
+                successMessage.classList.remove('hidden');
+                // Simulate email sending
+                console.log("Email would be sent to:", emailInput.value);
+            }
+        });
+
+        restartBtn.addEventListener('click', () => {
+            localStorage.clear();
+            location.reload();
+        });
+
+        function loadAssessment() {
+            const category = categories[currentStep];
+            document.getElementById('category-title').innerText = `${category} Questions`;
+            const questionsContainer = document.getElementById('questions');
+            questionsContainer.innerHTML = '';
+            questions[category].forEach((question, index) => {
+                const questionId = `${category}${index + 1}`;
+                questionsContainer.innerHTML += `
+                    <p>${question}</p>
+                    <input type="radio" name="${questionId}" value="0" onchange="updateAnswers('${questionId}')"> 0 
+                    <input type="radio" name="${questionId}" value="1" onchange="updateAnswers('${questionId}')"> 1 
+                    <input type="radio" name="${questionId}" value="2" onchange="updateAnswers('${questionId}')"> 2 
+                    <input type="radio" name="${questionId}" value="3" onchange="updateAnswers('${questionId}')"> 3 
+                    <input type="radio" name="${questionId}" value="4" onchange="updateAnswers('${questionId}')"> 4 
+                `;
+            });
+            document.getElementById('step-info').innerText = `Step ${currentStep + 1} of ${totalSteps}`;
+            progressBar.style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
+            nextBtn.disabled = !isCurrentStepAnswered();
+        }
+
+        function updateAnswers(questionId) {
+            const value = document.querySelector(`input[name="${questionId}"]:checked`).value;
+            answers[questionId] = Number(value);
+            nextBtn.disabled = !isCurrentStepAnswered();
+        }
+
+        function isCurrentStepAnswered() {
+            return questions[categories[currentStep]].every((_, index) => {
+                const questionId = `${categories[currentStep]}${index + 1}`;
+                return answers[questionId] !== undefined;
+            });
+        }
+
+        function calculateResults() {
+            const scores = {};
+            let overallScore = 0;
+
+            categories.forEach(category => {
+                const total = questions[category].length;
+                const categoryScore = Object.keys(answers)
+                    .filter(q => q.startsWith(category))
+                    .reduce((sum, q) => sum + answers[q], 0) / total * 100;
+                scores[category] = categoryScore;
+                overallScore += categoryScore * weights[category];
+            });
+
+            overallScore /= totalSteps;
+            const tier = determineTier(overallScore, scores);
+            displayResults(overallScore, tier, scores);
+        }
+
+        function determineTier(overallScore, scores) {
+            if (scores.E >= 80 || scores.C >= 85) return "Urgent";
+            if (overallScore < 25) return "Not Yet";
+            if (overallScore < 50) return "Soon";
+            if (overallScore < 75) return "Yes";
+            return "Urgent";
+        }
+
+        function displayResults(overallScore, tier, scores) {
+            resultsSection.classList.remove('hidden');
+            const tierMapping = {
+                "Not Yet": {
+                    title: "Not yet. You’re early, and that’s an advantage.",
+                    summary: "You likely don’t need a fractional Head of People today. Your focus is establishing lightweight foundations that don’t slow you down.",
+                    actions: [
+                        "Define decision rights for the top 5 recurring decisions.",
+                        "Create a simple onboarding checklist + 30/60/90 expectations for new hires.",
+                        "Establish a basic manager cadence: weekly 1:1s and a monthly team retro."
+                    ]
+                },
+                "Soon": {
+                    title: "Soon, the cracks are showing.",
+                    summary: "You’re starting to feel people drag: rework, slower ramp, inconsistent management. A fractional Head of People can help you prevent compounding issues.",
+                    actions: [
+                        "Clarify roles + ownership for the work that’s creating the most friction.",
+                        "Standardize hiring + interviewing for 2–3 critical roles.",
+                        "Implement a lightweight performance development system: clear expectations + monthly check-ins."
+                    ]
+                },
+                "Yes": {
+                    title: "Yes, people systems are now a growth constraint.",
+                    summary: "Your answers show compounding leadership and execution friction. Fractional Head of People support will create clarity, reduce re-litigation, and improve ramp + accountability.",
+                    actions: [
+                        "Build a performance architecture: role expectations, coaching process, escalation paths.",
+                        "Upgrade manager enablement: feedback, delegation, accountability norms.",
+                        "Put in an operating cadence that scales: planning, metrics, and decision hygiene."
+                    ]
+                },
+                "Urgent": {
+                    title: "Urgent: you’re in people-risk territory.",
+                    summary: "You’re likely experiencing active execution drag and elevated risk (manager breakdowns, unclear controls, or repeated misfires). You need near-term intervention to stabilize and scale.",
+                    actions: [
+                        "Run a 2–3 week 'People Systems Stabilization' sprint: roles, access, onboarding, risk gaps.",
+                        "Address manager performance immediately: hard conversations, coaching, and clear standards.",
+                        "Align incentives and accountability: define KPIs and tie leadership behavior to outcomes."
+                    ]
+                }
+            };
+
+            const result = tierMapping[tier];
+            document.getElementById('result-tier').innerText = result.title;
+            document.getElementById('overall-score').innerText = `Overall Score: ${overallScore.toFixed(2)}`;
+            document.getElementById('top-risk-signals').innerHTML = `
+                <h4>Top Risk Signals</h4>
+                ${Object.entries(scores).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([cat, score]) => `<p>${cat}: ${score.toFixed(2)}</p>`).join('')}
+            `;
+            document.getElementById('recommended-actions').innerHTML = `
+                <h4>Recommended Actions</h4>
+                <ol>
+                    ${result.actions.map(action => `<li>${action}</li>`).join('')}
+                </ol>
+            `;
+        }
+
+        function validateEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!regex.test(email)) {
+                alert("Please enter a valid email address.");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>
