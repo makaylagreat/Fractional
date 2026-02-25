@@ -31,15 +31,15 @@
       margin-bottom: 20px;
     }
     .progress-bar {
-      background-color: #007bff;
+      background-color: #445953;
       height: 8px;
       border-radius: 4px;
       width: 0%;
       transition: width 0.4s ease;
     }
-    h1, h2 { color: #333; }
+    h1, h2 { color: #445953; }
     button {
-      background-color: #007bff;
+      background-color: #445953;
       color: white;
       border: none;
       border-radius: 5px;
@@ -49,7 +49,7 @@
       margin-top: 10px;
       margin-right: 8px;
     }
-    button:hover { background-color: #0056b3; }
+    button:hover { background-color: #D57A4C; }
     button:disabled {
       background-color: #aaa;
       cursor: not-allowed;
@@ -80,7 +80,7 @@
     .score-bar {
       height: 10px;
       border-radius: 4px;
-      background: #007bff;
+      background: #445953;
       transition: width 0.5s ease;
     }
     .tier-badge {
@@ -93,19 +93,19 @@
       color: white;
     }
     .tier-urgent   { background-color: #dc3545; }
-    .tier-soon     { background-color: #fd7e14; }
+    .tier-soon     { background-color: #D57A4C; }
     .tier-emerging { background-color: #ffc107; color: #333; }
-    .tier-notyet   { background-color: #28a745; }
+    .tier-notyet   { background-color: #445953; }
     .risk-item {
       background: #fff3cd;
-      border-left: 4px solid #ffc107;
+      border-left: 4px solid #D57A4C;
       padding: 8px 12px;
       margin-bottom: 8px;
       border-radius: 4px;
     }
     .action-item {
       background: #d1ecf1;
-      border-left: 4px solid #007bff;
+      border-left: 4px solid #445953;
       padding: 8px 12px;
       margin-bottom: 8px;
       border-radius: 4px;
@@ -149,6 +149,15 @@
     }
     .modal-content input[type="checkbox"] { margin-right: 6px; }
     #success-message { color: green; font-weight: bold; }
+    .rating-scale-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 16px 0;
+      font-size: 14px;
+    }
+    .rating-scale-list li {
+      margin-bottom: 4px;
+    }
   </style>
 </head>
 <body>
@@ -163,6 +172,12 @@
   <div id="landing" class="step">
     <h1>Do I need a Fractional Head of People?</h1>
     <h2>Take this assessment to find out!</h2>
+    <p>
+      This 5-minute assessment will help you determine whether a Fractional Head of People
+      is something you should consider now or can revisit later. You'll receive a breakdown
+      of your score across five key categories, your top risk signals, and recommended next
+      steps tailored to where you are today.
+    </p>
     <button id="start-btn">Start</button>
   </div>
 
@@ -181,7 +196,14 @@
   <!-- Assessment -->
   <div id="assessment" class="step hidden">
     <h2 id="category-title"></h2>
-    <p><strong>Rating Scale:</strong> 1 = Strongly Disagree &nbsp;|&nbsp; 2 = Slightly Disagree &nbsp;|&nbsp; 3 = Somewhat Agree &nbsp;|&nbsp; 4 = Mostly Agree &nbsp;|&nbsp; 5 = Strongly Agree</p>
+    <p><strong>Rating Scale:</strong></p>
+    <ul class="rating-scale-list">
+      <li>1 = Strongly Disagree</li>
+      <li>2 = Slightly Disagree</li>
+      <li>3 = Somewhat Agree</li>
+      <li>4 = Mostly Agree</li>
+      <li>5 = Strongly Agree</li>
+    </ul>
     <div id="questions"></div>
     <div style="margin-top:16px;">
       <button id="back-btn">Back</button>
@@ -217,13 +239,13 @@
       <span>Send me occasional insights on people systems (max 1/month).</span>
     </label>
     <button id="submit-email" style="margin-top:14px;">Submit</button>
-    <p id="success-message" class="hidden">✅ Done — check your inbox.</p>
+    <p id="success-message" class="hidden">Done - check your inbox.</p>
     <p><small>MVP: Email sending is simulated in this demo.</small></p>
   </div>
 </div>
 
 <script>
-  // ─── Data ───────────────────────────────────────────────────────────────────
+  // Data
 
   const questions = {
     "Clarity & Operating Model": [
@@ -233,8 +255,8 @@
       "Cross-team handoffs regularly break because who does what isn't explicit."
     ],
     "Hiring & Ramp": [
-      "We've had a costly mishire in the last 6–9 months (or we're worried we're close).",
-      "New hires take longer than 60–90 days to become meaningfully productive.",
+      "We've had a costly mishire in the last 6-9 months (or we're worried we're close).",
+      "New hires take longer than 60-90 days to become meaningfully productive.",
       "Interviewing is inconsistent and different interviewers evaluate different things.",
       "Onboarding quality varies widely by manager or team."
     ],
@@ -266,19 +288,16 @@
     "Risk & Foundations":        0.15
   };
 
-  // ─── State ──────────────────────────────────────────────────────────────────
+  // State
 
   const categories = Object.keys(questions);
   const totalSteps = categories.length;
   let currentStep = 0;
   const answers = {};
 
-  // Safe key for HTML name attributes
   function safeKey(category, index) {
     return category.replace(/[^a-zA-Z0-9]/g, '_') + '_' + index;
   }
-
-  // ─── Check all questions in current step are answered ────────────────────────
 
   function isCurrentStepAnswered() {
     const category = categories[currentStep];
@@ -292,19 +311,11 @@
     return true;
   }
 
-  // ─── Update Next button state ────────────────────────────────────────────────
-
   function updateNextButton() {
     const answered = isCurrentStepAnswered();
     nextBtn.disabled = !answered;
-    if (currentStep === totalSteps - 1) {
-      nextBtn.textContent = answered ? 'See My Results' : 'See My Results';
-    } else {
-      nextBtn.textContent = 'Next';
-    }
+    nextBtn.textContent = currentStep === totalSteps - 1 ? 'See My Results' : 'Next';
   }
-
-  // ─── Load Assessment Step ────────────────────────────────────────────────────
 
   function loadAssessment() {
     const category = categories[currentStep];
@@ -313,14 +324,13 @@
     const container = document.getElementById('questions');
     container.innerHTML = '';
 
-    questions[category].forEach((questionText, index) => {
+    questions[category].forEach((question, index) => {
       const key = safeKey(category, index);
-
       const block = document.createElement('div');
       block.className = 'question-block';
 
       const p = document.createElement('p');
-      p.textContent = questionText;
+      p.textContent = question;
       block.appendChild(p);
 
       const radioGroup = document.createElement('div');
@@ -329,17 +339,14 @@
       for (let val = 1; val <= 5; val++) {
         const label = document.createElement('label');
         const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = key;
+        radio.value = val;
 
-        radio.type  = 'radio';
-        radio.name  = key;
-        radio.value = String(val);
-
-        // Restore previously saved answer
         if (answers[key] === val) {
           radio.checked = true;
         }
 
-        // Use closure to capture correct val
         (function(capturedVal, capturedKey) {
           radio.addEventListener('change', function() {
             if (this.checked) {
@@ -358,19 +365,16 @@
       container.appendChild(block);
     });
 
-    // Update progress and step info
     progressBar.style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
     document.getElementById('step-info').textContent =
       `Step ${currentStep + 1} of ${totalSteps}`;
 
-    // Show/hide back button
     backBtn.style.display = currentStep === 0 ? 'none' : 'inline-block';
 
-    // Update next button
     updateNextButton();
   }
 
-  // ─── Element refs ────────────────────────────────────────────────────────────
+  // Element refs
 
   const progressBar      = document.getElementById('progress-bar');
   const nextBtn          = document.getElementById('next-btn');
@@ -379,7 +383,7 @@
   const emailInput       = document.getElementById('email');
   const successMessage   = document.getElementById('success-message');
 
-  // ─── Navigation Events ───────────────────────────────────────────────────────
+  // Navigation Events
 
   document.getElementById('start-btn').addEventListener('click', () => {
     document.getElementById('landing').classList.add('hidden');
@@ -401,21 +405,19 @@
   });
 
   nextBtn.addEventListener('click', () => {
-    if (!isCurrentStepAnswered()) return; // Safety guard
+    if (!isCurrentStepAnswered()) return;
 
     if (currentStep < totalSteps - 1) {
       currentStep++;
       loadAssessment();
     } else {
-      // Last step — calculate and show results
       showResults();
     }
   });
 
-  // ─── Scoring & Results ───────────────────────────────────────────────────────
+  // Scoring & Results
 
   function showResults() {
-    // Calculate per-category scores (0–100)
     const scores = {};
     categories.forEach(category => {
       const numQ = questions[category].length;
@@ -428,7 +430,6 @@
       scores[category] = (total / maxPossible) * 100;
     });
 
-    // Weighted overall score (0–100)
     let overallScore = 0;
     categories.forEach(category => {
       overallScore += scores[category] * weights[category];
@@ -436,14 +437,13 @@
 
     const tier = determineTier(overallScore, scores);
 
-    // Hide assessment, show results
     document.getElementById('assessment').classList.add('hidden');
     document.getElementById('results').classList.remove('hidden');
 
     displayResults(overallScore, tier, scores);
   }
 
-  // ─── Tier Logic ──────────────────────────────────────────────────────────────
+  // Tier Logic
 
   function determineTier(overallScore, scores) {
     if (
@@ -457,7 +457,7 @@
     return "Not Yet";
   }
 
-  // ─── Display Results ─────────────────────────────────────────────────────────
+  // Display Results
 
   function displayResults(overallScore, tier, scores) {
     const tierColors = {
@@ -471,11 +471,11 @@
       "Urgent":
         "Your organisation shows multiple high-risk signals. A Fractional Head of People could have immediate, meaningful impact.",
       "Soon":
-        "You have real and growing people challenges. Engaging a Fractional Head of People in the next 1–3 months is advisable.",
+        "You have real and growing people challenges. Engaging a Fractional Head of People in the next 1-3 months is advisable.",
       "Emerging":
-        "Some early signals are present. It's worth monitoring and planning — a light-touch engagement may be beneficial.",
+        "Some early signals are present. It's worth monitoring and planning. A light-touch engagement may be beneficial.",
       "Not Yet":
-        "Your people foundations appear relatively solid for now. Revisit this assessment in 3–6 months as you scale."
+        "Your people foundations appear relatively solid for now. Revisit this assessment in 3-6 months as you scale."
     };
 
     document.getElementById('result-tier').innerHTML = `
@@ -489,7 +489,7 @@
         <div class="score-bar" style="width:${overallScore}%"></div>
       </div>
       <p style="font-size:13px;color:#666;">
-        Higher scores indicate stronger agreement with problem statements —
+        Higher scores indicate stronger agreement with problem statements,
         suggesting a greater need for people leadership support.
       </p>
     `;
@@ -510,25 +510,25 @@
       .filter(c => scores[c] >= 65)
       .sort((a, b) => scores[b] - scores[a]);
 
-    let riskHTML = '<h3>⚠️ Top Risk Signals</h3>';
+    let riskHTML = '<h3>Top Risk Signals</h3>';
     if (riskCategories.length === 0) {
       riskHTML += '<p>No categories are currently in the high-risk zone.</p>';
     } else {
       riskCategories.forEach(c => {
-        riskHTML += `<div class="risk-item"><strong>${c}</strong> — Score: ${scores[c].toFixed(1)}</div>`;
+        riskHTML += `<div class="risk-item"><strong>${c}</strong> - Score: ${scores[c].toFixed(1)}</div>`;
       });
     }
     document.getElementById('top-risk-signals').innerHTML = riskHTML;
 
     const actions = getRecommendedActions(tier, scores);
-    let actHTML = '<h3>✅ Recommended Next Steps</h3>';
+    let actHTML = '<h3>Recommended Next Steps</h3>';
     actions.forEach(a => {
       actHTML += `<div class="action-item">${a}</div>`;
     });
     document.getElementById('recommended-actions').innerHTML = actHTML;
   }
 
-  // ─── Recommended Actions ─────────────────────────────────────────────────────
+  // Recommended Actions
 
   function getRecommendedActions(tier, scores) {
     const actions = [];
@@ -537,7 +537,7 @@
       actions.push("Book a discovery call with a Fractional Head of People this week.");
       actions.push("Conduct a rapid people-risk audit across your top 3 scoring categories.");
     } else if (tier === "Soon") {
-      actions.push("Map your current people processes and identify the top 2–3 gaps.");
+      actions.push("Map your current people processes and identify the top 2-3 gaps.");
       actions.push("Explore a Fractional Head of People engagement starting next quarter.");
     } else if (tier === "Emerging") {
       actions.push("Document existing people policies to create a baseline.");
@@ -561,7 +561,7 @@
     return actions;
   }
 
-  // ─── Lead Capture Modal ──────────────────────────────────────────────────────
+  // Lead Capture Modal
 
   document.getElementById('email-results-btn').addEventListener('click', () => {
     leadCaptureModal.classList.add('active');
@@ -584,7 +584,7 @@
     console.log("Email captured:", email);
   });
 
-  // ─── Restart ─────────────────────────────────────────────────────────────────
+  // Restart
 
   document.getElementById('restart-btn').addEventListener('click', () => {
     location.reload();
@@ -593,5 +593,3 @@
 </script>
 </body>
 </html>
-
-
