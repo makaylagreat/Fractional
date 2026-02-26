@@ -608,7 +608,7 @@
 
     let categoryScoresText = '';
     categories.forEach(category => {
-      categoryScoresText += `${category}: ${scores[category].toFixed(1)} / 100\n`;
+      categoryScoresText += `${category}: ${scores[category].toFixed(1)} / 100<br>`;
     });
 
     const riskCategories = categories
@@ -620,13 +620,13 @@
       riskText = 'No categories are currently in the high-risk zone.';
     } else {
       riskCategories.forEach(c => {
-        riskText += `${c} - Score: ${scores[c].toFixed(1)}\n`;
+        riskText += `${c} - Score: ${scores[c].toFixed(1)}<br>`;
       });
     }
 
     let actionsText = '';
     actions.forEach((a, i) => {
-      actionsText += `${i + 1}. ${a}\n`;
+      actionsText += `${i + 1}. ${a}<br>`;
     });
 
     return {
