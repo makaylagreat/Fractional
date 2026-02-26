@@ -310,7 +310,7 @@
   let currentStep = 0;
   const answers = {};
 
-  // Store results globally so we can access them in the modal
+  // Global result storage
   let globalScores = {};
   let globalTier = '';
   let globalOverallScore = 0;
@@ -461,11 +461,13 @@
     const tier = determineTier(overallScore, scores);
     const actions = getRecommendedActions(tier, scores);
 
-    // Store globally for email use
-    globalScores = scores;
-    globalTier = tier;
-    globalOverallScore = overallScore;
-    globalActions = actions;
+    // Store globally BEFORE displaying
+    globalScores = JSON.parse(JSON.stringify(scores));
+    globalTier = String(tier);
+    globalOverallScore = parseFloat(overallScore);
+    globalActions = actions.slice();
+
+    console.log('Stored globals:', globalTier, globalOverallScore, globalScores, globalActions);
 
     document.getElementById('assessment').classList.add('hidden');
     document.getElementById('results').classList.remove('hidden');
@@ -590,7 +592,7 @@
     return actions;
   }
 
-  // Build plain-text email content from results
+  // Build email content
 
   function buildEmailContent(firstName, scores, tier, overallScore, actions) {
     const tierDescriptions = {
@@ -641,7 +643,6 @@
   // Lead Capture Modal
 
   document.getElementById('email-results-btn').addEventListener('click', () => {
-    // Reset modal state
     successMessage.classList.add('hidden');
     errorMessage.classList.add('hidden');
     sendingIndicator.classList.add('hidden');
@@ -665,7 +666,8 @@
     }
     emailInput.style.borderColor = '#ccc';
 
-    // Show sending state
+    console.log('Sending with globals:', globalTier, globalOverallScore, globalScores, globalActions);
+
     const submitBtn = document.getElementById('submit-email');
     submitBtn.disabled = true;
     sendingIndicator.classList.remove('hidden');
@@ -680,20 +682,17 @@
       globalActions
     );
 
-    // Add user email and insights preference
     templateParams.user_email = email;
     templateParams.wants_insights = wantsInsights ? 'Yes' : 'No';
 
-    // Send to user
     const sendToUser = emailjs.send(
-      'elevateintent_service',
+      'elevateIntent_service',
       'user_results',
       templateParams
     );
 
-    // Send to admin
     const sendToAdmin = emailjs.send(
-      'elevateintent_service',
+      'elevateIntent_service',
       'admin_notification',
       templateParams
     );
@@ -721,3 +720,4 @@
 </script>
 </body>
 </html>
+
