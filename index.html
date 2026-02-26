@@ -92,10 +92,10 @@
       margin-bottom: 12px;
       color: white;
     }
-    .tier-urgent   { background-color: #dc3545; }
-    .tier-soon     { background-color: #D57A4C; }
-    .tier-emerging { background-color: #ffc107; color: #333; }
-    .tier-notyet   { background-color: #445953; }
+    .tier-high-priority { background-color: #dc3545; }
+    .tier-build-now     { background-color: #D57A4C; }
+    .tier-emerging      { background-color: #ffc107; color: #333; }
+    .tier-foundation    { background-color: #445953; }
     .risk-item {
       background: #fff3cd;
       border-left: 4px solid #D57A4C;
@@ -165,6 +165,43 @@
       font-size: 13px;
       color: #666;
     }
+    .section-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .risk-label {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 8px;
+      color: white;
+    }
+    .risk-stable       { background-color: #445953; }
+    .risk-watch        { background-color: #ffc107; color: #333; }
+    .risk-action       { background-color: #D57A4C; }
+    .risk-high         { background-color: #dc3545; }
+    .cta-primary {
+      background-color: #D57A4C;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 12px 20px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: bold;
+      margin-top: 10px;
+      margin-right: 8px;
+      transition: background-color 0.3s;
+    }
+    .cta-primary:hover { background-color: #b8603a; }
+    .cta-secondary {
+      background-color: #445953;
+    }
   </style>
 </head>
 <body>
@@ -186,7 +223,7 @@
     <p>
       This 5-minute assessment will help you determine whether a Fractional Head of People
       is something you should consider now or can revisit later. You'll receive a breakdown
-      of your score across five key categories, your top risk signals, and recommended next
+      of your score across three key areas, your top risk signals, and recommended next
       steps tailored to where you are today.
     </p>
     <button id="start-btn">Start</button>
@@ -206,13 +243,15 @@
 
   <!-- Assessment -->
   <div id="assessment" class="step hidden">
+    <p class="section-label" id="section-label"></p>
     <h2 id="category-title"></h2>
+    <p style="font-size:13px;color:#555;margin-top:0;" id="section-description"></p>
     <p><strong>Rating Scale:</strong></p>
     <ul class="rating-scale-list">
       <li>1 = Strongly Disagree</li>
-      <li>2 = Slightly Disagree</li>
-      <li>3 = Somewhat Agree</li>
-      <li>4 = Mostly Agree</li>
+      <li>2 = Disagree</li>
+      <li>3 = Neutral / Unsure</li>
+      <li>4 = Agree</li>
       <li>5 = Strongly Agree</li>
     </ul>
     <div id="questions"></div>
@@ -231,8 +270,8 @@
     <div id="category-scores"></div>
     <div id="top-risk-signals"></div>
     <div id="recommended-actions"></div>
-    <button id="email-results-btn">Email me my 1-page action plan</button>
-    <button id="restart-btn">Start Over</button>
+    <div id="cta-buttons" style="margin-top:16px;"></div>
+    <button id="restart-btn" style="margin-top:8px;">Start Over</button>
   </div>
 
 </div>
@@ -260,74 +299,79 @@
   // Initialize EmailJS
   emailjs.init('Bm7DARr7qy74Rf5UN');
 
-  // Data
+  // ─── Data ────────────────────────────────────────────────────────────────────
 
-  const questions = {
-    "Clarity & Operating Model": [
-      "Decisions get re-litigated because decision rights aren't clear.",
-      "Ownership is fuzzy, and multiple people think they're responsible (or no one does).",
-      "Roles have evolved, but expectations and success metrics haven't been updated.",
-      "Cross-team handoffs regularly break because who does what isn't explicit."
-    ],
-    "Hiring & Ramp": [
-      "We've had a costly mishire in the last 6-9 months (or we're worried we're close).",
-      "New hires take longer than 60-90 days to become meaningfully productive.",
-      "Interviewing is inconsistent and different interviewers evaluate different things.",
-      "Onboarding quality varies widely by manager or team."
-    ],
-    "Managers & Performance": [
-      "Managers avoid hard conversations, so issues linger too long.",
-      "High performers are carrying too much because low performance isn't addressed quickly.",
-      "Great performance isn't clearly defined by role, level, or function.",
-      "Managers need more support coaching, feedback, delegation, and prioritization."
-    ],
-    "Retention & Culture": [
-      "We've lost, or nearly lost, a key employee unexpectedly in the last 12 months.",
-      "We don't have a reliable way to understand why people stay or leave.",
-      "Recognition and growth opportunities feel inconsistent across teams.",
-      "Culture and communication feel different depending on which leader you work for."
-    ],
-    "Risk & Foundations": [
-      "We're one people issue (performance, conflict, termination) away from chaos.",
-      "Policies and processes are ad hoc or unclear, creating inconsistency and risk.",
-      "People data (headcount, compensation, performance, attrition) is messy or not visible, so decisions are slower.",
-      "Access, onboarding, or compliance workflows aren't consistently controlled or documented."
-    ]
-  };
+  const sections = [
+    {
+      key: "Operating Clarity & Scale Readiness",
+      label: "Section 1 of 3",
+      description: "How clearly your org runs today and how much risk or drag is hiding in the system.",
+      questions: [
+        "Decisions stall because ownership is unclear.",
+        "Cross-team handoffs regularly break because who does what isn't explicit.",
+        "We're one people issue (performance, conflict, termination) away from chaos.",
+        "Policies and processes are ad hoc or unclear, creating inconsistency and risk.",
+        "People data (headcount, compensation, performance, attrition) is messy or not visible, so decisions are slower."
+      ],
+      // item keys: A1, A4, E1, E2, E3 — stored as indices 0-4
+    },
+    {
+      key: "Hiring Quality & Ramp",
+      label: "Section 2 of 3",
+      description: "How effectively you hire, evaluate, and get new people productive.",
+      questions: [
+        "We've had a costly mishire in the last 6-9 months (or we're worried we're close).",
+        "New hires take longer than 60-90 days to become meaningfully productive.",
+        "Interviewing is inconsistent and different interviewers evaluate different things."
+      ],
+      // item keys: B1, B2, B3
+    },
+    {
+      key: "Leaders, Performance & Retention",
+      label: "Section 3 of 3",
+      description: "How well leaders drive performance, consistency, and team health.",
+      questions: [
+        "Leaders avoid hard conversations, so issues linger too long.",
+        "High performers are carrying too much because low performance isn't addressed quickly.",
+        "Great performance isn't clearly defined by role, level, or function.",
+        "Leaders need more support with coaching, feedback, delegation, and prioritization.",
+        "We've lost, or nearly lost, a key employee unexpectedly in the last 12 months.",
+        "We don't have a reliable way to understand why people stay or leave.",
+        "Recognition and growth opportunities feel inconsistent across teams.",
+        "Culture and communication feel different depending on which leader you work for."
+      ],
+      // item keys: C1, C2, C3, C4, D1, D2, D3, D4
+    }
+  ];
 
-  const weights = {
-    "Clarity & Operating Model": 0.25,
-    "Hiring & Ramp":             0.20,
-    "Managers & Performance":    0.25,
-    "Retention & Culture":       0.15,
-    "Risk & Foundations":        0.15
-  };
+  // ─── State ───────────────────────────────────────────────────────────────────
 
-  // State
-
-  const categories = Object.keys(questions);
-  const totalSteps = categories.length;
+  const totalSteps = sections.length;
   let currentStep = 0;
-  const answers = {};
+  const answers = {}; // key: "sectionIndex_questionIndex" -> raw 1-5 value
 
-  // Global result storage
+  // Global result storage for email
   let globalScores = {};
   let globalTier = '';
   let globalOverallScore = 0;
   let globalActions = [];
+  let globalRawAnswers = {};
 
-  function safeKey(category, index) {
-    return category.replace(/[^a-zA-Z0-9]/g, '_') + '_' + index;
+  // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+  function answerKey(sectionIdx, qIdx) {
+    return `s${sectionIdx}_q${qIdx}`;
+  }
+
+  function normalize(response) {
+    return ((response - 1) / 4) * 100;
   }
 
   function isCurrentStepAnswered() {
-    const category = categories[currentStep];
-    const numQuestions = questions[category].length;
-    for (let i = 0; i < numQuestions; i++) {
-      const key = safeKey(category, i);
-      if (answers[key] === undefined || answers[key] === null) {
-        return false;
-      }
+    const section = sections[currentStep];
+    for (let i = 0; i < section.questions.length; i++) {
+      const key = answerKey(currentStep, i);
+      if (answers[key] === undefined || answers[key] === null) return false;
     }
     return true;
   }
@@ -338,15 +382,26 @@
     nextBtn.textContent = currentStep === totalSteps - 1 ? 'See My Results' : 'Next';
   }
 
+  function getSectionRiskLabel(score) {
+    if (score >= 80) return { label: 'High Risk',      cls: 'risk-high' };
+    if (score >= 60) return { label: 'Action Needed',  cls: 'risk-action' };
+    if (score >= 35) return { label: 'Watch',          cls: 'risk-watch' };
+    return           { label: 'Stable',                cls: 'risk-stable' };
+  }
+
+  // ─── Load Assessment Step ────────────────────────────────────────────────────
+
   function loadAssessment() {
-    const category = categories[currentStep];
-    document.getElementById('category-title').textContent = category;
+    const section = sections[currentStep];
+    document.getElementById('section-label').textContent    = section.label;
+    document.getElementById('category-title').textContent   = section.key;
+    document.getElementById('section-description').textContent = section.description;
 
     const container = document.getElementById('questions');
     container.innerHTML = '';
 
-    questions[category].forEach((question, index) => {
-      const key = safeKey(category, index);
+    section.questions.forEach((question, index) => {
+      const key = answerKey(currentStep, index);
       const block = document.createElement('div');
       block.className = 'question-block';
 
@@ -360,13 +415,11 @@
       for (let val = 1; val <= 5; val++) {
         const label = document.createElement('label');
         const radio = document.createElement('input');
-        radio.type = 'radio';
-        radio.name = key;
+        radio.type  = 'radio';
+        radio.name  = key;
         radio.value = val;
 
-        if (answers[key] === val) {
-          radio.checked = true;
-        }
+        if (answers[key] === val) radio.checked = true;
 
         (function(capturedVal, capturedKey) {
           radio.addEventListener('change', function() {
@@ -387,15 +440,12 @@
     });
 
     progressBar.style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
-    document.getElementById('step-info').textContent =
-      `Step ${currentStep + 1} of ${totalSteps}`;
-
+    document.getElementById('step-info').textContent = `Step ${currentStep + 1} of ${totalSteps}`;
     backBtn.style.display = currentStep === 0 ? 'none' : 'inline-block';
-
     updateNextButton();
   }
 
-  // Element refs
+  // ─── Element Refs ────────────────────────────────────────────────────────────
 
   const progressBar      = document.getElementById('progress-bar');
   const nextBtn          = document.getElementById('next-btn');
@@ -406,7 +456,7 @@
   const errorMessage     = document.getElementById('error-message');
   const sendingIndicator = document.getElementById('sending-indicator');
 
-  // Navigation Events
+  // ─── Navigation ──────────────────────────────────────────────────────────────
 
   document.getElementById('start-btn').addEventListener('click', () => {
     document.getElementById('landing').classList.add('hidden');
@@ -421,93 +471,163 @@
   });
 
   backBtn.addEventListener('click', () => {
-    if (currentStep > 0) {
-      currentStep--;
-      loadAssessment();
-    }
+    if (currentStep > 0) { currentStep--; loadAssessment(); }
   });
 
   nextBtn.addEventListener('click', () => {
     if (!isCurrentStepAnswered()) return;
-
-    if (currentStep < totalSteps - 1) {
-      currentStep++;
-      loadAssessment();
-    } else {
-      showResults();
-    }
+    if (currentStep < totalSteps - 1) { currentStep++; loadAssessment(); }
+    else showResults();
   });
 
-  // Scoring & Results
+  // ─── Scoring ─────────────────────────────────────────────────────────────────
+
+  function computeScores() {
+    const sectionScores = {};
+    sections.forEach((section, sIdx) => {
+      let total = 0;
+      section.questions.forEach((_, qIdx) => {
+        const key = answerKey(sIdx, qIdx);
+        total += normalize(answers[key] || 1);
+      });
+      sectionScores[section.key] = total / section.questions.length;
+    });
+
+    const overallScore = (
+      sectionScores["Operating Clarity & Scale Readiness"] +
+      sectionScores["Hiring Quality & Ramp"] +
+      sectionScores["Leaders, Performance & Retention"]
+    ) / 3;
+
+    return { sectionScores, overallScore };
+  }
+
+  function determineTier(overallScore) {
+    if (overallScore >= 80) return "High Priority";
+    if (overallScore >= 60) return "Build Now";
+    if (overallScore >= 35) return "Emerging";
+    return "Foundation Strong";
+  }
+
+  // ─── Recommendation Engine ───────────────────────────────────────────────────
+
+  function getRecommendations(sectionScores, overallScore) {
+    const rec = [];
+    const s = sectionScores;
+    const op  = s["Operating Clarity & Scale Readiness"];
+    const hi  = s["Hiring Quality & Ramp"];
+    const mgr = s["Leaders, Performance & Retention"];
+
+    // Raw answers by section for item-level triggers
+    // Section 0 (Operating): indices 0=A1, 1=A4, 2=E1, 3=E2, 4=E3
+    // Section 1 (Hiring):    indices 0=B1, 1=B2, 2=B3
+    // Section 2 (Manager):   indices 0=C1, 1=C2, 2=C3, 3=C4, 4=D1, 5=D2, 6=D3, 7=D4
+    const a = (sIdx, qIdx) => answers[answerKey(sIdx, qIdx)] || 1;
+
+    // 12 - Fractional Head of People (top 3 if triggered)
+    if (overallScore >= 70 || (op >= 60 && mgr >= 60) ||
+        [op, hi, mgr].filter(x => x >= 60).length >= 2 ||
+        Math.max(op, hi, mgr) >= 80) {
+      rec.push("Consider hiring a Fractional Head of People / Fractional CPO to build the operating foundation, improve leader leverage, and reduce execution drag while your company scales.");
+    }
+
+    // 9 - 90-day people operating plan
+    if (overallScore >= 60 || [op, hi, mgr].filter(x => x >= 60).length >= 2) {
+      rec.push("Create a 90-day people operating plan focused on the top 2 to 3 risk areas with clear owners, milestones, and success measures.");
+    }
+
+    // 11 - Light-touch advisory
+    if (!rec.some(r => r.includes('Fractional')) &&
+        (overallScore >= 35 && overallScore < 60 ||
+         [op, hi, mgr].filter(x => x >= 60).length === 1)) {
+      rec.push("Consider a light-touch people advisory engagement to prioritize fixes, sequence the work, and support leaders without overbuilding too early.");
+    }
+
+    // 1 - RACI / decision ownership
+    if (a(0,0) >= 4 || a(0,1) >= 4 || op >= 60) {
+      rec.push("Create a simple RACI for your highest-friction cross-functional decisions and workflows to reduce stalled decisions and broken handoffs.");
+    }
+
+    // 2 - Document core people policies
+    if (a(0,3) >= 4 || op >= 60) {
+      rec.push("Document your core people policies and processes to create a consistent baseline and reduce leader-by-leader variation.");
+    }
+
+    // 3 - People metrics dashboard
+    if (a(0,4) >= 4 || (a(0,2) >= 4 && a(0,4) >= 3)) {
+      rec.push("Create a basic people dashboard (headcount, open roles, time to fill, ramp progress, attrition, performance status) so leaders can make faster, cleaner decisions.");
+    }
+
+    // 4 - Standardize interviewing
+    if (a(1,0) >= 4 || a(1,2) >= 4 || hi >= 60) {
+      rec.push("Standardize your interview process with role-based scorecards, interviewer calibration, and a clear decision process to reduce mis-hire risk.");
+    }
+
+    // 5 - Onboarding and ramp plans
+    if (a(1,1) >= 4 || hi >= 60) {
+      rec.push("Define a consistent onboarding checklist and 30-60-90 day ramp plan for priority roles so new hires become productive faster.");
+    }
+
+    // 6 - Leader coaching
+    if (a(2,0) >= 4 || a(2,3) >= 4 || mgr >= 60) {
+      rec.push("Introduce structured leader coaching (or a peer learning cohort) focused on feedback, delegation, prioritization, and performance conversations.");
+    }
+
+    // 7 - Define performance expectations
+    if (a(2,1) >= 4 || a(2,2) >= 4 || mgr >= 60) {
+      rec.push("Define what great performance looks like by role and level so leaders can coach consistently and address low performance earlier.");
+    }
+
+    // 8 - Stay interviews
+    if (a(2,4) >= 4 || a(2,5) >= 4 || a(2,6) >= 4 || a(2,7) >= 4 || mgr >= 60) {
+      rec.push("Run stay interviews with key employees this quarter and review retention signals by team to identify preventable attrition risk early.");
+    }
+
+    // 10 - Re-take (always last)
+    rec.push("Set a calendar reminder to re-take this assessment in 90 days and compare scores by section to track progress.");
+
+    // Cap at 5 unique recommendations (re-take always included as last)
+    const retak = rec.pop(); // remove re-take temporarily
+    const deduped = [...new Set(rec)].slice(0, 4);
+    deduped.push(retak); // add back as final
+    return deduped;
+  }
+
+  // ─── Show Results ─────────────────────────────────────────────────────────────
 
   function showResults() {
-    const scores = {};
-    categories.forEach(category => {
-      const numQ = questions[category].length;
-      const maxPossible = numQ * 5;
-      let total = 0;
-      questions[category].forEach((_, index) => {
-        const key = safeKey(category, index);
-        total += (answers[key] || 0);
-      });
-      scores[category] = (total / maxPossible) * 100;
-    });
+    const { sectionScores, overallScore } = computeScores();
+    const tier    = determineTier(overallScore);
+    const actions = getRecommendations(sectionScores, overallScore);
 
-    let overallScore = 0;
-    categories.forEach(category => {
-      overallScore += scores[category] * weights[category];
-    });
-
-    const tier = determineTier(overallScore, scores);
-    const actions = getRecommendedActions(tier, scores);
-
-    // Store globally BEFORE displaying
-    globalScores = JSON.parse(JSON.stringify(scores));
-    globalTier = String(tier);
+    globalScores       = JSON.parse(JSON.stringify(sectionScores));
+    globalTier         = String(tier);
     globalOverallScore = parseFloat(overallScore);
-    globalActions = actions.slice();
-
-    console.log('Stored globals:', globalTier, globalOverallScore, globalScores, globalActions);
+    globalActions      = actions.slice();
 
     document.getElementById('assessment').classList.add('hidden');
     document.getElementById('results').classList.remove('hidden');
 
-    displayResults(overallScore, tier, scores, actions);
+    displayResults(overallScore, tier, sectionScores, actions);
   }
 
-  // Tier Logic
-
-  function determineTier(overallScore, scores) {
-    if (
-      scores["Risk & Foundations"]     >= 75 ||
-      scores["Managers & Performance"] >= 80 ||
-      overallScore >= 75
-    ) return "Urgent";
-
-    if (overallScore >= 55) return "Soon";
-    if (overallScore >= 35) return "Emerging";
-    return "Not Yet";
-  }
-
-  // Display Results
-
-  function displayResults(overallScore, tier, scores, actions) {
+  function displayResults(overallScore, tier, sectionScores, actions) {
     const tierColors = {
-      "Urgent":   "tier-urgent",
-      "Soon":     "tier-soon",
-      "Emerging": "tier-emerging",
-      "Not Yet":  "tier-notyet"
+      "High Priority":   "tier-high-priority",
+      "Build Now":       "tier-build-now",
+      "Emerging":        "tier-emerging",
+      "Foundation Strong": "tier-foundation"
     };
 
     const tierDescriptions = {
-      "Urgent":
-        "Your organisation shows multiple high-risk signals. A Fractional Head of People could have immediate, meaningful impact.",
-      "Soon":
-        "You have real and growing people challenges. Engaging a Fractional Head of People in the next 1-3 months is advisable.",
+      "High Priority":
+        "People-system risk is likely slowing growth and increasing operational strain. This is a strong signal to bring in experienced people leadership support now.",
+      "Build Now":
+        "Multiple people-system issues are likely affecting execution, leader effectiveness, or hiring quality. A structured people operating plan is recommended in the near term.",
       "Emerging":
-        "Some early signals are present. It's worth monitoring and planning. A light-touch engagement may be beneficial.",
-      "Not Yet":
-        "Your people foundations appear relatively solid for now. Revisit this assessment in 3-6 months as you scale."
+        "Early signals are present. It is worth planning now so issues do not compound as you grow. A light-touch engagement or targeted support may be beneficial.",
+      "Foundation Strong":
+        "Your people systems appear relatively stable for your current stage. Keep monitoring and strengthen a few areas before they become bottlenecks."
     };
 
     document.getElementById('result-tier').innerHTML = `
@@ -526,11 +646,15 @@
       </p>
     `;
 
-    let catHTML = '<h3>Category Breakdown</h3>';
-    categories.forEach(category => {
-      const s = scores[category].toFixed(1);
+    let catHTML = '<h3>Section Breakdown</h3>';
+    sections.forEach(section => {
+      const s    = sectionScores[section.key].toFixed(1);
+      const risk = getSectionRiskLabel(parseFloat(s));
       catHTML += `
-        <p style="margin:4px 0 2px 0;"><strong>${category}</strong>: ${s} / 100</p>
+        <p style="margin:4px 0 2px 0;">
+          <strong>${section.key}</strong>: ${s} / 100
+          <span class="risk-label ${risk.cls}">${risk.label}</span>
+        </p>
         <div class="score-bar-wrap">
           <div class="score-bar" style="width:${s}%"></div>
         </div>
@@ -538,16 +662,24 @@
     });
     document.getElementById('category-scores').innerHTML = catHTML;
 
-    const riskCategories = categories
-      .filter(c => scores[c] >= 65)
-      .sort((a, b) => scores[b] - scores[a]);
+    // Top Risk Signals
+    const highRisk    = sections.filter(s => sectionScores[s.key] >= 80).sort((a,b) => sectionScores[b.key] - sectionScores[a.key]);
+    const actionNeeded = sections.filter(s => sectionScores[s.key] >= 60 && sectionScores[s.key] < 80).sort((a,b) => sectionScores[b.key] - sectionScores[a.key]);
+    const watching     = sections.filter(s => sectionScores[s.key] >= 50 && sectionScores[s.key] < 60).sort((a,b) => sectionScores[b.key] - sectionScores[a.key]);
+
+    const riskList = [...highRisk, ...actionNeeded].slice(0, 3);
 
     let riskHTML = '<h3>Top Risk Signals</h3>';
-    if (riskCategories.length === 0) {
-      riskHTML += '<p>No categories are currently in the high-risk zone.</p>';
+    if (riskList.length === 0) {
+      if (watching.length > 0) {
+        riskHTML += `<p>No categories are currently in the high-risk zone, but the following areas are emerging and worth monitoring: ${watching.map(s => s.key).join(', ')}.</p>`;
+      } else {
+        riskHTML += '<p>No categories are currently in the high-risk zone.</p>';
+      }
     } else {
-      riskCategories.forEach(c => {
-        riskHTML += `<div class="risk-item"><strong>${c}</strong> - Score: ${scores[c].toFixed(1)}</div>`;
+      riskList.forEach(s => {
+        const risk = getSectionRiskLabel(sectionScores[s.key]);
+        riskHTML += `<div class="risk-item"><strong>${s.key}</strong> - Score: ${sectionScores[s.key].toFixed(1)} <span class="risk-label ${risk.cls}">${risk.label}</span></div>`;
       });
     }
     document.getElementById('top-risk-signals').innerHTML = riskHTML;
@@ -557,70 +689,79 @@
       actHTML += `<div class="action-item">${a}</div>`;
     });
     document.getElementById('recommended-actions').innerHTML = actHTML;
-  }
 
-  // Recommended Actions
-
-  function getRecommendedActions(tier, scores) {
-    const actions = [];
-
-    if (tier === "Urgent") {
-      actions.push("Book a discovery call with a Fractional Head of People this week.");
-      actions.push("Conduct a rapid people-risk audit across your top 3 scoring categories.");
-    } else if (tier === "Soon") {
-      actions.push("Map your current people processes and identify the top 2-3 gaps.");
-      actions.push("Explore a Fractional Head of People engagement starting next quarter.");
-    } else if (tier === "Emerging") {
-      actions.push("Document existing people policies to create a baseline.");
-      actions.push("Set a calendar reminder to re-take this assessment in 90 days.");
+    // CTA buttons based on tier
+    const ctaContainer = document.getElementById('cta-buttons');
+    if (tier === "High Priority") {
+      ctaContainer.innerHTML = `
+        <button class="cta-primary" id="cta-talk">Talk to a Fractional Head of People / CPO</button>
+        <button id="email-results-btn">Email me my 1-page action plan</button>
+      `;
+    } else if (tier === "Build Now") {
+      ctaContainer.innerHTML = `
+        <button class="cta-primary" id="cta-call">Book a diagnostic call</button>
+        <button id="email-results-btn">Email me my 1-page action plan</button>
+      `;
     } else {
-      actions.push("Continue investing in manager development and culture.");
-      actions.push("Revisit this assessment when headcount grows by 20%+ or post-funding.");
+      ctaContainer.innerHTML = `
+        <button class="cta-primary" id="email-results-btn">Email me my 1-page action plan</button>
+      `;
     }
 
-    if (scores["Hiring & Ramp"] >= 60)
-      actions.push("Standardise your interview scorecard and onboarding checklist.");
-    if (scores["Managers & Performance"] >= 60)
-      actions.push("Introduce structured manager coaching or a peer learning cohort.");
-    if (scores["Retention & Culture"] >= 60)
-      actions.push("Run stay interviews with key employees this quarter.");
-    if (scores["Risk & Foundations"] >= 60)
-      actions.push("Audit compliance documentation and access controls immediately.");
-    if (scores["Clarity & Operating Model"] >= 60)
-      actions.push("Run a RACI exercise for your top 5 recurring cross-team decisions.");
-
-    return actions;
+    // Re-attach email modal listener (since button was just re-created)
+    document.getElementById('email-results-btn').addEventListener('click', openModal);
   }
 
-  // Build email content
+  // ─── Modal ───────────────────────────────────────────────────────────────────
+
+  function openModal() {
+    successMessage.classList.add('hidden');
+    errorMessage.classList.add('hidden');
+    sendingIndicator.classList.add('hidden');
+    leadCaptureModal.classList.add('active');
+  }
+
+  leadCaptureModal.addEventListener('click', (e) => {
+    if (e.target === leadCaptureModal) leadCaptureModal.classList.remove('active');
+  });
+
+  // ─── Build Email Content ─────────────────────────────────────────────────────
 
   function buildEmailContent(firstName, scores, tier, overallScore, actions) {
     const tierDescriptions = {
-      "Urgent":
-        "Your organisation shows multiple high-risk signals. A Fractional Head of People could have immediate, meaningful impact.",
-      "Soon":
-        "You have real and growing people challenges. Engaging a Fractional Head of People in the next 1-3 months is advisable.",
+      "High Priority":
+        "People-system risk is likely slowing growth and increasing operational strain. This is a strong signal to bring in experienced people leadership support now.",
+      "Build Now":
+        "Multiple people-system issues are likely affecting execution, leader effectiveness, or hiring quality. A structured people operating plan is recommended in the near term.",
       "Emerging":
-        "Some early signals are present. It's worth monitoring and planning. A light-touch engagement may be beneficial.",
-      "Not Yet":
-        "Your people foundations appear relatively solid for now. Revisit this assessment in 3-6 months as you scale."
+        "Early signals are present. It is worth planning now so issues do not compound as you grow. A light-touch engagement or targeted support may be beneficial.",
+      "Foundation Strong":
+        "Your people systems appear relatively stable for your current stage. Keep monitoring and strengthen a few areas before they become bottlenecks."
     };
 
     let categoryScoresText = '';
-    categories.forEach(category => {
-      categoryScoresText += `${category}: ${scores[category].toFixed(1)} / 100<br>`;
+    sections.forEach(section => {
+      const score = scores[section.key];
+      const risk  = getSectionRiskLabel(score);
+      categoryScoresText += `${section.key}: ${score.toFixed(1)} / 100 (${risk.label})<br>`;
     });
 
-    const riskCategories = categories
-      .filter(c => scores[c] >= 65)
-      .sort((a, b) => scores[b] - scores[a]);
+    const highRisk     = sections.filter(s => scores[s.key] >= 80).sort((a,b) => scores[b.key] - scores[a.key]);
+    const actionNeeded = sections.filter(s => scores[s.key] >= 60 && scores[s.key] < 80).sort((a,b) => scores[b.key] - scores[a.key]);
+    const watching     = sections.filter(s => scores[s.key] >= 50 && scores[s.key] < 60);
+    const riskList     = [...highRisk, ...actionNeeded].slice(0, 3);
 
     let riskText = '';
-    if (riskCategories.length === 0) {
-      riskText = 'No categories are currently in the high-risk zone.';
+    if (riskList.length === 0) {
+      if (watching.length > 0) {
+        riskText = `No categories are currently in the high-risk zone, but the following areas are emerging and worth monitoring: ${watching.map(s => s.key).join(', ')}.`;
+      } else {
+        riskText = 'No categories are currently in the high-risk zone.';
+      }
     } else {
-      riskCategories.forEach(c => {
-        riskText += `${c} - Score: ${scores[c].toFixed(1)}<br>`;
+      riskList.forEach(s => {
+        const risk = getSectionRiskLabel(scores[s.key]);
+        riskText += `${s.key}: ${scores[s.key].toFixed(1)} / 100 (${risk.label})<br>`;
       });
     }
 
@@ -630,35 +771,21 @@
     });
 
     return {
-      first_name: firstName || 'there',
-      overall_score: overallScore.toFixed(1),
-      tier: tier,
-      tier_description: tierDescriptions[tier],
-      category_scores: categoryScoresText,
-      risk_signals: riskText,
-      recommended_actions: actionsText
+      first_name:           firstName || 'there',
+      overall_score:        overallScore.toFixed(1),
+      tier:                 tier,
+      tier_description:     tierDescriptions[tier],
+      category_scores:      categoryScoresText,
+      risk_signals:         riskText,
+      recommended_actions:  actionsText
     };
   }
 
-  // Lead Capture Modal
-
-  document.getElementById('email-results-btn').addEventListener('click', () => {
-    successMessage.classList.add('hidden');
-    errorMessage.classList.add('hidden');
-    sendingIndicator.classList.add('hidden');
-    leadCaptureModal.classList.add('active');
-  });
-
-  leadCaptureModal.addEventListener('click', (e) => {
-    if (e.target === leadCaptureModal) {
-      leadCaptureModal.classList.remove('active');
-    }
-  });
+  // ─── Submit Email ────────────────────────────────────────────────────────────
 
   document.getElementById('submit-email').addEventListener('click', () => {
-    console.log('Globals at send time:', globalTier, globalOverallScore, globalScores);
-    const email = emailInput.value.trim();
-    const firstName = document.getElementById('first-name').value.trim();
+    const email      = emailInput.value.trim();
+    const firstName  = document.getElementById('first-name').value.trim();
     const wantsInsights = document.getElementById('insights-checkbox').checked;
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -667,8 +794,6 @@
     }
     emailInput.style.borderColor = '#ccc';
 
-    console.log('Sending with globals:', globalTier, globalOverallScore, globalScores, globalActions);
-
     const submitBtn = document.getElementById('submit-email');
     submitBtn.disabled = true;
     sendingIndicator.classList.remove('hidden');
@@ -676,27 +801,13 @@
     errorMessage.classList.add('hidden');
 
     const templateParams = buildEmailContent(
-      firstName,
-      globalScores,
-      globalTier,
-      globalOverallScore,
-      globalActions
+      firstName, globalScores, globalTier, globalOverallScore, globalActions
     );
-
-    templateParams.user_email = email;
+    templateParams.user_email     = email;
     templateParams.wants_insights = wantsInsights ? 'Yes' : 'No';
 
-    const sendToUser = emailjs.send(
-      'elevateIntent_service',
-      'user_results',
-      templateParams
-    );
-
-    const sendToAdmin = emailjs.send(
-      'elevateIntent_service',
-      'admin_notification',
-      templateParams
-    );
+    const sendToUser  = emailjs.send('elevateIntent_service', 'user_results',       templateParams);
+    const sendToAdmin = emailjs.send('elevateIntent_service', 'admin_notification', templateParams);
 
     Promise.all([sendToUser, sendToAdmin])
       .then(() => {
@@ -712,7 +823,7 @@
       });
   });
 
-  // Restart
+  // ─── Restart ─────────────────────────────────────────────────────────────────
 
   document.getElementById('restart-btn').addEventListener('click', () => {
     location.reload();
@@ -721,4 +832,3 @@
 </script>
 </body>
 </html>
-
