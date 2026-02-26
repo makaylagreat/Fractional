@@ -656,6 +656,7 @@
   });
 
   document.getElementById('submit-email').addEventListener('click', () => {
+    console.log('Globals at send time:', globalTier, globalOverallScore, globalScores);
     const email = emailInput.value.trim();
     const firstName = document.getElementById('first-name').value.trim();
     const wantsInsights = document.getElementById('insights-checkbox').checked;
