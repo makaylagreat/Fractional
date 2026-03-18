@@ -301,6 +301,8 @@
 <script>
   emailjs.init('Bm7DARr7qy74Rf5UN');
 
+  const CALENDLY_URL = 'https://calendly.com/makaylagreathouse/let-s-connect-live';
+
   // ─── Data ────────────────────────────────────────────────────────────────────
 
   const sections = [
@@ -616,14 +618,16 @@
       `;
       document.getElementById('cta-talk').addEventListener('click', () => {
         trackEvent('cta_clicked', { cta_label: 'Talk to a Fractional Head of People' });
+        window.open(CALENDLY_URL, '_blank');
       });
     } else if (tier === "Build Now") {
       ctaContainer.innerHTML = `
-        <button class="cta-primary" id="cta-call">Book a diagnostic call</button>
+        <button class="cta-primary" id="cta-call">Schedule a Diagnostic Call</button>
         <button id="email-results-btn">Email me my 1-page action plan</button>
       `;
       document.getElementById('cta-call').addEventListener('click', () => {
-        trackEvent('cta_clicked', { cta_label: 'Book a diagnostic call' });
+        trackEvent('cta_clicked', { cta_label: 'Schedule a Diagnostic Call' });
+        window.open(CALENDLY_URL, '_blank');
       });
     } else {
       ctaContainer.innerHTML = `<button class="cta-primary" id="email-results-btn">Email me my 1-page action plan</button>`;
